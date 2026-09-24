@@ -57,6 +57,15 @@ npm start            # → http://localhost:8080
 | サーバーをデプロイ | Render / Fly.io / Railway 等に Node アプリとしてデプロイ（`PORT` 環境変数に対応） |
 | 静的ホスティング（サーバー不要） | GitHub Pages 等にリポジトリをそのまま置くだけ。ルームサーバーが見つからないと自動で **PeerJS（WebRTC P2P）** に切り替わる（PeerJS の公開ブローカーを使用） |
 
+### GitHub Pages で公開する（サーバー不要）
+1. GitHub のリポジトリページ → **Settings** → 左メニュー **Pages**
+2. **Build and deployment** の Source を **Deploy from a branch** にする
+3. Branch で `claude/dazzling-hopper-tgzldo`、フォルダ `/ (root)` を選んで **Save**
+4. 1〜2分後、`https://shindou12.github.io/nyaagoro/` で遊べる（同じページの上部にURLが表示される）
+
+友だちにはこのURLを送り、片方が「部屋をつくる」、もう片方が部屋IDで「部屋に入る」。
+この方式では PeerJS の公開サービスを使ってブラウザ同士を直接つなぎます。
+
 接続方式は待機ルームに「ルームサーバー接続 / P2P接続」と表示されます。
 
 ## テスト
