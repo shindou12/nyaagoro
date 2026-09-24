@@ -138,7 +138,7 @@ export class MatchPresenter {
       const pl = this.plate(slot);
       pl.setCat(this.breed(slot));
       pl.setName(this.name(slot), this.isMe(slot) ? 'YOU' : this.s.players[slot].cpu ? 'CPU' : 'RIVAL');
-      pl.setLives(f.lives[slot], START_LIVES); pl.setRole(null); pl.setActive(false); pl.setDanger(false); pl.setGift(0);
+      pl.setLives(f.lives[slot], f.lives[slot]); pl.setRole(null); pl.setActive(false); pl.setDanger(false); pl.setGift(0);
       pl.show();
       const a = this.actor(slot);
       a.setBreed(this.breed(slot)); a.setBase('idle', this.now()); a.crown = false; a.alpha = 1; a.emote = null; a.reverse = false;

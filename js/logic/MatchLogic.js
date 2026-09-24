@@ -10,7 +10,7 @@ export class MatchLogic {
   constructor({ first = 0, lives = START_LIVES, rng = Math.random } = {}) {
     this.first = first;
     this.rng = rng;
-    this.lives = [lives, lives];
+    this.lives = Array.isArray(lives) ? [...lives] : [lives, lives];
     this.turnNo = 0;
     this.phase = 'idle';
     this.until = 0;

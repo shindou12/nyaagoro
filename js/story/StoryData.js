@@ -15,7 +15,7 @@ const FOCUS = { eyes: 'focus', mouth: 'smug' };
 export const STAGES = [
   {
     id: 1, cat: 'mike', name: 'ミケ', title: '雨上がりの看板娘', night: '満月まで あと9夜',
-    skill: 0.12, goronya: 0, hype: 0,
+    slip: 0.2, maxLen: 3, lives: 1, goronya: 0, hype: 0,
     pre: [
       ['nar', '雨上がりの路地裏。ネオンが 水たまりに にじんでいる。'],
       ['op', 'あら、チビちゃん。今夜も 練習？', SMILE],
@@ -30,7 +30,7 @@ export const STAGES = [
   },
   {
     id: 2, cat: 'tama', name: 'タマ', title: 'のれんが揺れる夜', night: '満月まで あと8夜',
-    skill: 0.25, goronya: 0.1, hype: 0,
+    slip: 0.16, maxLen: 3, lives: 1, goronya: 0, hype: 0,
     pre: [
       ['nar', '屋台の のれんが、風に ゆれている。'],
       ['op', 'おう、チビ！ 聞いたか？ この屋台、来月で おしまいなんだ。', GRIN],
@@ -46,7 +46,7 @@ export const STAGES = [
   },
   {
     id: 3, cat: 'neo', name: 'ネオ', title: '音のない DJ ブース', night: '満月まで あと7夜',
-    skill: 0.36, goronya: 0.25, hype: 1,
+    slip: 0.13, maxLen: 4, lives: 1, goronya: 0.15, hype: 1,
     pre: [
       ['nar', 'いつも ビートが鳴っていたスピーカーが、今夜は 静かだ。'],
       ['op', '電気、止められちまった。', CALM],
@@ -61,7 +61,7 @@ export const STAGES = [
   },
   {
     id: 4, cat: 'yuki', name: 'ユキ', title: '月を見るおじょうさま', night: '満月まで あと6夜',
-    skill: 0.46, goronya: 0.3, hype: 1,
+    slip: 0.1, maxLen: 4, lives: 2, goronya: 0.25, hype: 1,
     pre: [
       ['nar', '白い猫が、段ボールの上で 月を見ている。'],
       ['op', 'チビさん。わたくし、来週 引っ越しますの。', CALM],
@@ -77,7 +77,7 @@ export const STAGES = [
   },
   {
     id: 5, cat: 'hachi', name: 'ハチ', title: 'サングラスの兄貴', night: '満月まで あと5夜',
-    skill: 0.55, goronya: 0.4, hype: 1,
+    slip: 0.08, maxLen: 5, lives: 2, goronya: 0.35, hype: 1,
     pre: [
       ['op', 'よう。', FOCUS],
       ['op', '師匠のこと、気づいてるか？ もう何日も、この路地に 来てねえ。'],
@@ -93,7 +93,7 @@ export const STAGES = [
   },
   {
     id: 6, cat: 'piko', name: 'ピコ', title: '消せないメモリ', night: '満月まで あと4夜',
-    skill: 0.63, goronya: 0.5, hype: 2,
+    slip: 0.065, maxLen: 6, lives: 2, goronya: 0.45, hype: 2,
     pre: [
       ['op', 'ピピッ。チビ、大変な データを 拾ったヨ。', SURPRISE],
       ['op', '『再開発のお知らせ。次の満月の夜をもって、この路地は 取り壊されます』'],
@@ -109,7 +109,7 @@ export const STAGES = [
   },
   {
     id: 7, cat: 'luna', name: 'ルナ', title: 'はじめて灯した看板', night: '満月まで あと3夜',
-    skill: 0.71, goronya: 0.55, hype: 2,
+    slip: 0.055, maxLen: 7, lives: 2, goronya: 0.5, hype: 2,
     pre: [
       ['nar', '壊れかけの ネオン看板を、ルナが 直している。'],
       ['op', '見て。『NYAGORO CUP』。師匠が はじめて灯した 看板なの。', SMILE],
@@ -124,7 +124,7 @@ export const STAGES = [
   },
   {
     id: 8, cat: 'yoru', name: 'ヨル', title: '夜の主', night: '満月まで あと2夜',
-    skill: 0.79, goronya: 0.6, hype: 2,
+    slip: 0.045, maxLen: 8, lives: 2, goronya: 0.55, hype: 2,
     pre: [
       ['nar', '夜の主と呼ばれる 黒猫が、静かに 待っていた。'],
       ['op', '師匠のことを 知りたいんだろう。', CALM],
@@ -141,7 +141,7 @@ export const STAGES = [
   },
   {
     id: 9, cat: 'gray', name: 'ハイじい', title: '古い友だち', night: '満月まで あと1夜',
-    skill: 0.86, goronya: 0.65, hype: 3,
+    slip: 0.035, maxLen: 9, lives: 2, goronya: 0.6, hype: 3,
     pre: [
       ['op', 'ほっほ、キミが チビか。わしは 師匠の 古い友だちでな。', SMILE],
       ['op', 'あいつは昔、捨てられて 震えておった。この路地が、あいつの 家になった。', CALM],
@@ -156,7 +156,7 @@ export const STAGES = [
   },
   {
     id: 10, cat: 'boss', name: '師匠', title: 'さいごの満月', night: '満月の夜',
-    skill: 0.94, goronya: 0.75, hype: 3, final: true,
+    slip: 0.025, maxLen: 99, lives: 2, goronya: 0.7, hype: 3, final: true,
     pre: [
       ['nar', '満月の夜。取り壊し前の、最後の 路地裏。'],
       ['nar', '看板も、屋台も、みんなの声も、今夜で おしまい。'],

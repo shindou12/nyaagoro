@@ -142,14 +142,15 @@ export class Session {
     this.lastFirst = first;
     this.votes = [false, false];
     this.inMatch = true;
-    this.logic = new MatchLogic({ first });
+    const op = this.opts.opponent || {};
+    this.logic = new MatchLogic({ first, lives: [2, op.lives ?? 2] });
     this.logic.onFact = (f) => {
       if (this.net) this.send({ t: 'fact', f });
       if (this.bot) this.bot.onFact(f);
       this.onFact(f);
       if (f.type === 'matchEnd') { this.inMatch = false; if (this.mode === 'cpu') setTimeout(() => { this.votes[1] = true; this.onRematch(this.votes); }, 1800 + Math.random() * 1500); }
     };
-    if (this.mode === 'cpu') this.bot = new CpuBrain(1, (a) => this.logic && this.logic.input(1, a, performance.now()), { skill: this.opts.opponent?.skill ?? 0.55, goronya: this.opts.opponent?.goronya ?? 0.55 });
+    if (this.mode === 'cpu') this.bot = new CpuBrain(1, (a) => this.logic && this.logic.input(1, a, performance.now()), { slip: op.slip ?? 0.05, goronya: op.goronya ?? 0.55, maxLen: op.maxLen ?? 99 });
     if (this.net) this.send({ t: 'start', first });
     this.onStart({ first });
     this.logic.start(performance.now());

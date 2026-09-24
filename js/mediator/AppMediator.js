@@ -458,7 +458,7 @@ export class AppMediator {
     if (!st || n > this.storyCleared + 1) return;
     const r = this.root;
     this.leaveSession();
-    this.attach(new Session('cpu', null, { ...this.me }, { opponent: { name: st.name, cat: st.cat, skill: st.skill, goronya: st.goronya } }));
+    this.attach(new Session('cpu', null, { ...this.me }, { opponent: { name: st.name, cat: st.cat, slip: st.slip, maxLen: st.maxLen, lives: st.lives, goronya: st.goronya } }));
     this.session.players[0].ready = true;
     this.story = { stage: st };
     this.resetEnding();
