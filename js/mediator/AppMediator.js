@@ -14,7 +14,7 @@
 import { MatchPresenter } from './MatchPresenter.js';
 import { Session, pickOther } from '../net/Session.js';
 import { pickTransport } from '../net/transports.js';
-import { PLAYER_CATS } from '../art/catArt.js';
+import { PLAYER_CATS, BREEDS } from '../art/catArt.js';
 
 const store = {
   get(k, d) { try { return localStorage.getItem('nyagoro.' + k) ?? d; } catch { return d; } },
@@ -47,6 +47,7 @@ export class AppMediator {
     const r = this.root;
     r.title.setName(this.me.name);
     r.title.setMuted(this.muted);
+    if (window.NYAGORO_OFFLINE) { r.title.setOnline(false); this.inviteCode = ''; }
     [r.plateL, r.plateR, r.track, r.round, r.hype].forEach((v) => v.hide());
     r.catL.setBreed(this.me.cat); r.catR.setBreed(pickOther(this.me.cat));
     r.catL.alpha = r.catR.alpha = 0;
@@ -316,7 +317,7 @@ export class AppMediator {
     if (slot === s.localSlots[0]) { this.me.cat = next; store.set('cat', next); }
     this.sfx.ui('tick');
     const b = next;
-    import('../art/catArt.js').then(({ BREEDS }) => this.sfx.nya(BREEDS[b].voice, BREEDS[b].pitch, slot ? 0.4 : -0.4, 0.7));
+    this.sfx.nya(BREEDS[b].voice, BREEDS[b].pitch, slot ? 0.4 : -0.4, 0.7);
     this.refreshWaiting();
   }
 

@@ -41,8 +41,8 @@ export class TitleMenu extends Panel {
     this.card.append(h('label', { class: 'name-row' }, h('span', {}, 'きみの なまえ'), this.nameIn));
     const grid = h('div', { class: 'menu-grid' });
     this.card.append(grid);
-    this.button('create', '<b>部屋をつくる</b><small>友だちを招待</small>', 'big pink', grid);
-    this.button('join', '<b>部屋に入る</b><small>部屋IDで参加</small>', 'big cyan', grid);
+    this.createBtn = this.button('create', '<b>部屋をつくる</b><small>友だちを招待</small>', 'big pink', grid);
+    this.joinBtn = this.button('join', '<b>部屋に入る</b><small>部屋IDで参加</small>', 'big cyan', grid);
     this.button('cpu', '<b>CPUと練習</b><small>師匠ネコと1本勝負</small>', 'mid', grid);
     this.button('local', '<b>1台でふたり</b><small>交代で遊ぶ</small>', 'mid', grid);
     const foot = h('div', { class: 'menu-foot' });
@@ -51,6 +51,11 @@ export class TitleMenu extends Panel {
     this.muteBtn = this.button('mute', '♪ ON', 'small', foot);
   }
   setName(n) { this.nameIn.value = n; }
+  setOnline(on) {
+    if (on) return;
+    this.createBtn.setLabel('<b>部屋をつくる</b><small>サイト版で遊べます</small>'); this.createBtn.setEnabled(false);
+    this.joinBtn.setLabel('<b>部屋に入る</b><small>サイト版で遊べます</small>'); this.joinBtn.setEnabled(false);
+  }
   setMuted(m) { this.muteBtn.setLabel(m ? '♪ OFF' : '♪ ON'); }
 }
 
