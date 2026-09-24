@@ -61,7 +61,8 @@ export class AppMediator {
     this.state = state;
     const panels = { title: r.title, creating: r.createPanel, joining: r.joinPanel, waiting: r.waitPanel, result: r.resultPanel, howto: r.howto, disconnected: r.discPanel };
     for (const [k, p] of Object.entries(panels)) { if (k === state) p.open(); else p.close(); }
-    if (state !== 'match' && state !== 'result' && state !== 'disconnected' && (prev === 'match' || prev === 'result')) this.presenter.teardown();
+    if (state !== 'match' && state !== 'result' && state !== 'disconnected' && this.presenter.phase !== 'none') this.presenter.teardown();
+    void prev;
     // stage cats + mood per screen
     const S = r.scene;
     if (state === 'title' || state === 'howto') {

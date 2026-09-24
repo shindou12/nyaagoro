@@ -21,7 +21,7 @@ export class Session {
       { name: me.name, cat: me.cat, ready: false, present: true },
       { name: '', cat: null, ready: false, present: false },
     ];
-    if (mode === 'guest') this.players = [{ name: '', cat: null, ready: false, present: true }, { name: me.name, cat: me.cat, ready: false, present: true }];
+    if (mode === 'guest') this.players = [{ name: '', cat: null, ready: false, present: false }, { name: me.name, cat: me.cat, ready: false, present: true }];
     if (mode === 'cpu') this.players[1] = { name: '師匠ネコ', cat: pickOther(me.cat), ready: true, present: true, cpu: true };
     if (mode === 'local') this.players[1] = { name: 'P2', cat: pickOther(me.cat), ready: true, present: true };
     this.localSlots = mode === 'host' || mode === 'cpu' ? [0] : mode === 'guest' ? [1] : [0, 1];

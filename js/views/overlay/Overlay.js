@@ -9,8 +9,10 @@ const restart = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el
 
 export class SpeechBubbles extends View {
   constructor() { super('SpeechBubbles', { className: 'bubbles' }); }
-  say(x, y, text, kind = 'nya', ms = 700) {
+  say(x, y, text, kind = 'nya', ms = 700, key = null) {
+    if (key) this.el.querySelectorAll(`[data-key="${key}"]`).forEach((o) => o.remove());
     const b = h('div', { class: 'bubble k-' + kind }, text);
+    if (key) b.dataset.key = key;
     b.style.left = pctX(x); b.style.top = pctY(y);
     this.el.append(b);
     setTimeout(() => b.classList.add('out'), ms);

@@ -114,6 +114,7 @@ class PlayerCard extends View {
     this.breed = null; this.present = false;
   }
   set({ present, name, breed, ready, you, editable, label, host }) {
+    if (!BREEDS[breed]) present = false;
     this.present = present;
     this.el.classList.toggle('empty', !present);
     this.el.classList.toggle('ready', !!ready);

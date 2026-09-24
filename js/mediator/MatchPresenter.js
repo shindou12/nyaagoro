@@ -85,7 +85,7 @@ export class MatchPresenter {
       this.r.screenFx.flash('#ff3ea5', 260);
       if (big) this.r.screenFx.shake(1);
     }
-    this.r.bubbles.say(p.x, p.y - 44, WORD[action], action, action === ACT.GORONYA ? 900 : 520);
+    this.r.bubbles.say(p.x, p.y - 44, WORD[action], action, action === ACT.GORONYA ? 900 : 520, 'cat' + this.sideOf(slot));
   }
 
   /** Immediate local feedback (before the authoritative fact arrives). */
@@ -224,7 +224,7 @@ export class MatchPresenter {
       this.actor(C).wiggleBox(this.now());
       this.sfx.secret(this.pan(C));
       const p = this.pos(C);
-      this.r.bubbles.say(p.x, p.y - 40, '？', 'small', 380);
+      this.r.bubbles.say(p.x, p.y - 40, '？', 'small', 380, 'cat' + this.sideOf(C));
       this.showComposeSlot(f.index, f.action, C);
       if (f.action === ACT.GORONYA) { r.track.setReverseFrom(f.index); this.r.fx.burst(p.x, p.y - 20, 'sparkle', 10, 'goronya'); r.bubbles.say(p.x, p.y - 52, 'ガサゴソ!?', 'goronya', 700); }
     } else if (!this.previewed.has(key)) {
@@ -521,6 +521,7 @@ export class MatchPresenter {
     this.S.reverse = false;
     this.spotSide = 0;
     r.vs.cancel(); r.resultTrans.cancel();
+    r.bubbles.clear(); r.banner.clear();
   }
 }
 

@@ -101,7 +101,7 @@ export class GameRoot extends View {
     const vw = window.innerWidth, vh = window.innerHeight;
     const portrait = vh > vw * 1.1;
     this.el.classList.toggle('portrait', portrait);
-    const padH = portrait ? Math.min(vh * 0.3, vw * 0.42) : 0;
+    const padH = portrait ? Math.min(vh * 0.34, vw * 0.6) : 0;
     let w = Math.min(vw, (vh - padH) * 16 / 9);
     // prefer crisp integer-ish pixel scale when there's room
     const scale = w / 320;
@@ -110,6 +110,7 @@ export class GameRoot extends View {
     const s = this.stage.el.style;
     s.width = w + 'px'; s.height = hgt + 'px';
     this.el.style.setProperty('--px', (w / 320) + 'px');
+    this.el.style.setProperty('--p', (w / 320) + 'px');
     this.el.style.setProperty('--pad-h', padH + 'px');
   }
 

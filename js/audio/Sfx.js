@@ -156,10 +156,10 @@ export class Sfx {
     for (let i = 0; i < 2 + level; i++) a.sample(pick(AUDIENCE_VOICES), { rate: rnd(0.62, 0.8), gain: rnd(0.25, 0.4), pan: rnd(-0.9, 0.9), when: t + 0.1 + rnd(0, 0.35), bus: 'crowd', maxDur: 0.8 });
     a.noise(0.9, { filterType: 'bandpass', freq: 520, freqTo: 380, q: 3, gain: 0.08 + level * 0.02, attack: 0.25, bus: 'crowd' });
   }
-  crowdMeow(level) { // ambient single meow from the audience
+  crowdMeow(level = 1) { // ambient single meow from the audience
     this.a.sample(pick(AUDIENCE_VOICES), { rate: rnd(0.9, 1.5), gain: rnd(0.08, 0.16) * (0.6 + level * 0.2), pan: rnd(-1, 1), bus: 'crowd', maxDur: 0.6 });
   }
-  chant(level) { // "にゃ！にゃ！" crowd chant at high hype
+  chant(level = 1) { // "にゃ！にゃ！" crowd chant at high hype
     const a = this.a;
     for (let i = 0; i < 2 + level; i++) a.sample(pick(AUDIENCE_VOICES), { rate: rnd(1.2, 1.4), gain: 0.12, pan: rnd(-1, 1), bus: 'crowd', maxDur: 0.25, when: a.now + rnd(0, 0.03) });
   }

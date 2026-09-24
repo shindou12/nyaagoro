@@ -116,13 +116,13 @@ const SLOTS = [
   // tier 0 — the regulars
   { x: 97, y: 96, b: 'mike', tier: 0 }, { x: 212, y: 94, b: 'blue', tier: 0 }, { x: 116, y: 116, b: 'kiji', tier: 0 },
   // tier 1
-  { x: 187, y: 114, b: 'punk', tier: 1 }, { x: 235, y: 112, b: 'cream', tier: 1 }, { x: 44, y: 58, b: 'gray', tier: 1 },
+  { x: 187, y: 114, b: 'punk', tier: 1 }, { x: 168, y: 128, b: 'cream', tier: 1 }, { x: 44, y: 58, b: 'gray', tier: 1 },
   // tier 2
   { x: 38, y: 144, b: 'sabi', tier: 2 }, { x: 284, y: 144, b: 'choco', tier: 2 }, { x: 28, y: 92, b: 'tama', tier: 2 }, { x: 100, y: 64, b: 'neo', tier: 2 }, { x: 222, y: 64, b: 'luna', tier: 2 },
   // tier 3
-  { x: 16, y: 158, b: 'yuki', tier: 3 }, { x: 306, y: 158, b: 'hachi', tier: 3 }, { x: 136, y: 128, b: 'boss', tier: 3 }, { x: 182, y: 128, b: 'piko', tier: 3 }, { x: 288, y: 20, b: 'yoru', tier: 3 }, { x: 22, y: 14, b: 'kiji', tier: 3 },
+  { x: 16, y: 158, b: 'yuki', tier: 3 }, { x: 306, y: 158, b: 'hachi', tier: 3 }, { x: 136, y: 128, b: 'boss', tier: 3 }, { x: 196, y: 128, b: 'piko', tier: 3 }, { x: 288, y: 20, b: 'yoru', tier: 3 }, { x: 22, y: 14, b: 'kiji', tier: 3 },
   // tier 4 — everyone's here
-  { x: 120, y: 128, b: 'cream', tier: 4 }, { x: 198, y: 128, b: 'blue', tier: 4 }, { x: 160, y: 64, b: 'punk', tier: 4 }, { x: 261, y: 70, b: 'gray', tier: 4 },
+  { x: 118, y: 128, b: 'cream', tier: 4 }, { x: 152, y: 127, b: 'blue', tier: 4 }, { x: 160, y: 64, b: 'punk', tier: 4 }, { x: 261, y: 70, b: 'gray', tier: 4 },
   { x: 60, y: 92, b: 'mike', tier: 4 }, { x: 300, y: 104, b: 'sabi', tier: 4 }, { x: 58, y: 58, b: 'choco', tier: 4 },
 ];
 const STICK_COLORS = ['#43e8ff', '#ff3ea5', '#ffd23e', '#7dff6a', '#b18cff'];
