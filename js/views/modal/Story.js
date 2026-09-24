@@ -13,7 +13,7 @@ export class StoryMapPanel extends Panel {
     this.head = h('div', { class: 'story-head' },
       h('div', { class: 'story-kicker' }, 'STORY'),
       h('div', { class: 'panel-title' }, 'さいごの満月'),
-      h('div', { class: 'story-lead' }, '取り壊しが決まった ネオン路地裏。姿を見せない 師匠を待ちながら、最後の まねっこ勝負を。'));
+      h('div', { class: 'story-lead' }, '満月の夜、ネオン路地裏は 取り壊される。帰ってこない 師匠を探して、一夜ずつ まねっこ勝負。'));
     this.progress = h('div', { class: 'story-progress' });
     this.grid = h('div', { class: 'story-grid' });
     this.card.append(this.head, this.progress, this.grid);
@@ -100,12 +100,12 @@ export class DialogueView extends View {
       return b;
     }));
   }
-  showCard(title, sub) {
+  showCard(title, sub, tap = 'タップで タイトルへ', kind = 'end') {
     this.box.classList.add('is-hidden');
     this.faceL.replaceChildren(); this.faceR.replaceChildren();
     this.choices.replaceChildren();
-    this.card.innerHTML = `<div class="dc-title">${title}</div><div class="dc-sub">${sub}</div><div class="dc-tap">タップで タイトルへ</div>`;
-    this.card.classList.remove('is-hidden');
+    this.card.innerHTML = `<div class="dc-title">${title}</div><div class="dc-sub">${sub}</div><div class="dc-tap">${tap}</div>`;
+    this.card.className = 'dlg-card k-' + kind;
   }
   update() {
     if (!this.visible || !this.typing) return;

@@ -18,6 +18,7 @@ export class SceneParams {
     this.focus = 0;         // -1 left cat, +1 right, 0 none (audience looks)
     this.flash = 0;
     this.dim = 0;           // 0..1 lights going out (story ending)
+    this.noCrowd = false;   // empty alley (story flashback)
   }
 }
 
@@ -171,6 +172,7 @@ export class AudienceCats extends CanvasView {
   }
   drawCat(ctx, c, t) {
     const S = this.S;
+    if (S.noCrowd) return;
     const visible = S.hypeShown + 0.001 >= c.tier;
     if (visible && !c.shown) { c.shown = true; c.t0 = t; }
     if (!visible && c.shown) c.shown = false;
@@ -355,7 +357,7 @@ export class FrontRow extends CanvasView {
   }
   draw(ctx, t) {
     const S = this.S;
-    const n = Math.round(3 + S.hypeShown * 2.5);
+    const n = S.noCrowd ? 0 : Math.round(3 + S.hypeShown * 2.5);
     for (let i = 0; i < Math.min(n, this.heads.length); i++) {
       const h = this.heads[i];
       const spr = backHead(h.w, h.seed);

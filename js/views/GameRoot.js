@@ -136,5 +136,8 @@ export class GameRoot extends View {
     s.transition = `transform ${ms}ms cubic-bezier(.2,.9,.25,1.08)`; s.transform = 'scale(1)';
   }
 
+  /** sepia-ish memory tint over the world (story flashbacks) */
+  setFlashback(on) { this.el.classList.toggle('flashback', !!on); }
+
   update(t, dt) { super.update(t, dt); }
 }

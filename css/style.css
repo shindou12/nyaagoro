@@ -579,3 +579,12 @@ kbd { font-family: inherit; background: #2a2258; color: #fff; padding: 0 calc(va
 .portrait .dlg-face { bottom: auto; top: calc(var(--wt) + var(--band) + var(--p)*4); width: calc(var(--p)*62); height: calc(var(--p)*54); }
 .portrait .dlg-text { font-size: calc(var(--p)*8); }
 .portrait .dlg-choices { bottom: auto; top: calc(var(--wt) + var(--band) + var(--p)*120); }
+
+/* story: night countdown card + flashback tint */
+.dlg-card.k-night { background: radial-gradient(ellipse at 50% 45%, rgba(20, 14, 50, .88), rgba(3, 2, 10, .97)); animation: cardfade .8s ease both; }
+.dlg-card.k-night .dc-title { font-size: calc(var(--p)*20); color: #fff6c9; letter-spacing: calc(var(--p)*2); text-shadow: 0 0 calc(var(--p)*8) rgba(255, 207, 138, .45); }
+.dlg-card.k-night .dc-sub { font-size: calc(var(--p)*7); color: var(--cyan); letter-spacing: calc(var(--p)*1); }
+.dlg-card.k-night .dc-tap { margin-top: calc(var(--p)*10); }
+.flashback .world-wrap { filter: sepia(.75) saturate(.55) brightness(.75) contrast(1.05); transition: filter .8s; }
+.flashback .world-wrap::before { content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none; background: radial-gradient(ellipse at center, transparent 45%, rgba(20, 10, 5, .75) 100%); }
+.world-wrap { transition: filter .8s; }

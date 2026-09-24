@@ -23,6 +23,10 @@ export class Sfx {
     if (kind === 'join') [72, 76, 79, 84].forEach((m, i) => a.tone(mtof(m), 0.12, { type: 'triangle', gain: 0.1, when: a.now + i * 0.07, send: 0.2 }));
     if (kind === 'ready') [79, 84].forEach((m, i) => a.tone(mtof(m), 0.1, { type: 'square', gain: 0.06, when: a.now + i * 0.08, filter: 5000 }));
   }
+  bell() { // the master's little bell: チリン
+    const a = this.a;
+    [0, 0.09].forEach((d, i) => { a.tone(i ? 3520 : 2637, 0.9, { type: 'sine', gain: 0.09, when: a.now + d, send: 0.5, attack: 0.002, release: 0.8 }); a.tone(i ? 5274 : 3951, 0.5, { type: 'sine', gain: 0.03, when: a.now + d, send: 0.4 }); });
+  }
   keyDown() { this.a.tone(2400, 0.015, { type: 'square', gain: 0.025, filter: 5000 }); }
 
   // ---------------------------------------------------------------- actions

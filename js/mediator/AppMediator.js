@@ -17,7 +17,7 @@ import { MatchPresenter } from './MatchPresenter.js';
 import { Session, pickOther } from '../net/Session.js';
 import { pickTransport } from '../net/transports.js';
 import { PLAYER_CATS, BREEDS } from '../art/catArt.js';
-import { STAGES, ENDING } from '../story/StoryData.js';
+import { STAGES, ENDING, CHARS } from '../story/StoryData.js';
 
 const store = {
   get(k, d) { try { return localStorage.getItem('nyagoro.' + k) ?? d; } catch { return d; } },
@@ -73,6 +73,7 @@ export class AppMediator {
     if (state !== 'match' && state !== 'result' && state !== 'disconnected' && this.presenter.phase !== 'none') this.presenter.teardown();
     void prev;
     r.dialogue.setVisible(state === 'dialogue');
+    if (state !== 'dialogue') { r.setFlashback(false); r.scene.noCrowd = false; }
     if (state !== 'dialogue') this.dlg = null;
     if (state === 'title' || state === 'story') this.resetEnding();
     // stage cats + mood per screen
@@ -497,30 +498,62 @@ export class AppMediator {
   }
 
   playDialogue(lines, done, opts = {}) {
-    this.dlg = { lines, i: 0, done, opts };
+    this.dlg = { lines, i: 0, done, opts, right: opts.right ?? this.story?.stage.char ?? null };
     this.showLine();
   }
 
   showLine() {
     const d = this.dlg, r = this.root, t = performance.now() / 1000;
-    const st = this.story?.stage;
+    // run stage directives until we reach something to show
+    while (d.i < d.lines.length && d.lines[d.i][0].startsWith('@') && d.lines[d.i][0] !== '@card') { this.directive(d.lines[d.i]); d.i += 1; }
+    if (d.i >= d.lines.length) { this.dlg = null; d.done(); return; }
     const [who, text, expr] = d.lines[d.i];
-    const opBreed = d.opts.noOp ? null : st?.cat;
-    r.dialogue.line({ who, text, expr, name: who === 'me' ? this.me.name : st?.name || '', meBreed: this.me.cat, opBreed });
+    if (who === '@card') {
+      d.inCard = true;
+      r.dialogue.showCard(text, expr || '', 'タップで つづく', 'night');
+      this.sfx.memorize();
+      return;
+    }
+    const ch = CHARS[who];
+    if (ch && d.right !== who) this.setRight(who);
+    const right = d.right ? CHARS[d.right] : null;
+    r.dialogue.line({ who: who === 'me' || who === 'nar' ? who : 'op', text, expr, name: who === 'me' ? this.me.name : ch ? ch.name : '', meBreed: this.me.cat, opBreed: right ? right.cat : null });
     // the speaking cat reacts on stage
-    const actor = who === 'me' ? r.catL : who === 'op' ? r.catR : null;
+    const actor = who === 'me' ? r.catL : ch ? r.catR : null;
     if (actor && actor.alpha > 0.5) {
       const sad = expr && expr.eyes === 'tear';
+      const quiet = expr && (expr.eyes === 'sleepy' || expr.eyes === 'closed');
       if (sad) actor.setBase('sad', t);
-      else { if (actor.base === 'sad' || actor.base === 'happy') actor.setBase('idle', t); actor.play(expr && expr.mouth === 'grin' ? 'hop' : 'hop', t); }
+      else { if (actor.base === 'sad' || actor.base === 'happy') actor.setBase('idle', t); if (!quiet) actor.play('hop', t); }
     }
-    d.opts.onLine && d.opts.onLine(d.i);
+  }
+
+  /** who stands on the right side of the stage / dialogue */
+  setRight(id) {
+    const d = this.dlg, r = this.root;
+    d.right = id;
+    if (!id) return;
+    const t = performance.now() / 1000;
+    r.catR.setBreed(CHARS[id].cat); r.catR.alpha = 1; r.catR.setBase('idle', t); r.catR.play('hop', t);
+  }
+
+  directive([cmd, arg]) {
+    const r = this.root, t = performance.now() / 1000;
+    switch (cmd) {
+      case '@flash': r.setFlashback(!!arg); r.scene.noCrowd = !!arg; r.scene.dim = arg ? 0.85 : 0; break;
+      case '@cat': this.setRight(arg); break;
+      case '@bell': this.sfx.bell(); break;
+      case '@dim': if (this.ending) this.ending.dimming = true; break;
+      case '@walk': if (this.ending) { this.ending.walking = true; r.catR.setBase('idle', t); } break;
+      case '@leave': this.dlg.right = null; break;
+    }
   }
 
   dlgNext() {
     const d = this.dlg, r = this.root;
     if (!d || d.choosing) return;
     if (d.card) { this.leaveSession(); this.go('title'); return; }
+    if (d.inCard) { d.inCard = false; d.i += 1; this.showLine(); return; }
     if (r.dialogue.isTyping()) { r.dialogue.finish(); return; }
     d.i += 1;
     if (d.i < d.lines.length) this.showLine();
@@ -542,20 +575,12 @@ export class AppMediator {
     r.scene.hype = 0;
     this.bgm.setHype(0); this.bgm.setMode('ending');
     this.stageCats(this.me.cat, 'boss', 'idle', 'idle');
+    this.sfx.nya(BREEDS[this.me.cat].voice, BREEDS[this.me.cat].pitch * 0.92, -0.3, 0.8);
     this.playDialogue(ENDING, () => {
       this.dlg = { card: true };
-      r.dialogue.showCard('さいごの満月　おしまい', `あそんでくれて ありがとう。<br>${this.me.name} と ${STAGES.length}ぴきの 路地裏の なかまたち`);
+      r.dialogue.showCard('さいごの満月　おしまい', `あそんでくれて ありがとう。<br>${this.me.name} と 路地裏の なかまたち`, 'タップで タイトルへ');
       this.sfx.memorize();
-    }, {
-      noSkip: false,
-      onLine: (i) => {
-        if (i === 0) this.ending.dimming = true;
-        if (i === 1) { this.ending.walking = true; r.catR.setBase('idle', performance.now() / 1000); }
-        if (i === 3) { r.catL.setBase('sad', performance.now() / 1000); this.sfx.nya(BREEDS[this.me.cat].voice, BREEDS[this.me.cat].pitch * 0.92, -0.3, 0.8); }
-        if (i === 2) this.dlg.opts.noOp = true; // after this line he is gone
-        if (i === 4) r.catL.setBase('idle', performance.now() / 1000);
-      },
-    });
+    }, { right: 'shisho' });
   }
 
   resetEnding() {

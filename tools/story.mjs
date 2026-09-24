@@ -15,8 +15,8 @@ await p.reload();
 await p.waitForTimeout(600); await p.keyboard.press('x'); await p.waitForTimeout(3600);
 await shot('s0-title');
 await p.click('[data-view="Button:story"]'); await p.waitForTimeout(600); await shot('s1-map');
-await p.click('.stage-card.next'); await p.waitForTimeout(1500); await shot('s2-pre');
-for (let i = 0; i < 20 && (await st()).s === 'dialogue'; i++) { await p.keyboard.press('Space'); await p.waitForTimeout(250); }
+await p.click('.stage-card.next'); await p.waitForTimeout(1200); await shot('s2a-card');
+for (let i = 0; i < 120 && (await st()).s === 'dialogue'; i++) { await p.keyboard.press('Space'); await p.waitForTimeout(260); if (i === 6) await shot('s2b-flashback'); if (i === 30) await shot('s2c-notice'); }
 console.log('after pre:', (await st()).s);
 // play stage 1 for real
 const chord = async () => { await p.keyboard.down('f'); await p.keyboard.down('j'); await p.waitForTimeout(30); await p.keyboard.up('f'); await p.keyboard.up('j'); };
@@ -37,7 +37,7 @@ await p.waitForTimeout(1500);
 let s = await st();
 console.log('after match:', s.s, 'cleared', s.cleared);
 await shot('s3-post');
-for (let i = 0; i < 20 && (await st()).s === 'dialogue'; i++) { await p.keyboard.press('Space'); await p.waitForTimeout(250); }
+for (let i = 0; i < 80 && (await st()).s === 'dialogue'; i++) { await p.keyboard.press('Space'); await p.waitForTimeout(250); if (i === 16) await shot('s3b-post-hook'); }
 await p.waitForTimeout(600);
 s = await st(); console.log('after post:', s.s, 'cleared', s.cleared);
 await shot('s4-map2');
