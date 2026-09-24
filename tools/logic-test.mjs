@@ -88,4 +88,23 @@ test('early confirm needs 2 inputs, inputs from wrong player ignored', () => {
   assert.ok(facts.find((f) => f.type === 'composeReject' && f.reason === 'tooShort'));
 });
 
+test('ごろにゃーの壊れたマスは相手の次の出題ターンに+1される', () => {
+  const facts = run(({ m, step, inp }) => {
+    step(T.matchIntro + T.turnIntro + 100);
+    assert.equal(m.slots, 4);
+    inp(0, NYA); inp(0, GORONYA); inp(0, GORO);           // 4-1 = 3 → locks
+    step(8000);
+    while (m.phase === 'replay') inp(1, expectedAt(m.seq, m.replayIdx));
+    step(T.judgeOk + T.turnIntro + 100);
+    assert.equal(m.composer, 1);
+    assert.equal(m.slots, 5);                               // round 1 (4) + gift (1)
+  });
+  const lock = facts.find((f) => f.type === 'composeLock');
+  assert.equal(lock.gift, 1); assert.equal(lock.giftTo, 1);
+  const t2 = facts.filter((f) => f.type === 'turnStart')[1];
+  assert.equal(t2.bonus, 1);
+  const t3 = facts.filter((f) => f.type === 'turnStart')[2];
+  assert.ok(!t3 || t3.bonus === 0, 'gift is used once');
+});
+
 console.log(`\n${n} tests passed`);

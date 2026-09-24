@@ -16,7 +16,8 @@ export class PlayerPlate extends View {
     this.tagEl = h('div', { class: 'plate-tag' });
     this.fish = h('div', { class: 'plate-fish' });
     this.roleEl = h('div', { class: 'plate-role' });
-    this.el.append(this.face, h('div', { class: 'plate-body' }, h('div', { class: 'plate-top' }, this.tagEl, this.nameEl), this.fish), this.roleEl);
+    this.giftEl = h('div', { class: 'plate-gift is-hidden' });
+    this.el.append(this.giftEl, this.face, h('div', { class: 'plate-body' }, h('div', { class: 'plate-top' }, this.tagEl, this.nameEl), this.fish), this.roleEl);
     this.lives = 0;
   }
   setCat(breed, expr = {}) { this.face.replaceChildren(img(portrait(breed, expr, this.side > 0), 'portrait')); this.breed = breed; }
@@ -39,6 +40,12 @@ export class PlayerPlate extends View {
   }
   setActive(on) { this.el.classList.toggle('is-active', !!on); }
   setDanger(on) { this.el.classList.toggle('is-danger', !!on); }
+  /** extra slots this cat will get on its next compose turn (ごろにゃーのおかえし) */
+  setGift(n) {
+    this.giftEl.textContent = n ? `次の出題 +${n}マス` : '';
+    this.giftEl.classList.toggle('is-hidden', !n);
+    if (n) { this.giftEl.classList.remove('pop'); void this.giftEl.offsetWidth; this.giftEl.classList.add('pop'); }
+  }
 }
 
 // ------------------------------------------------------------------ round + hype
@@ -48,9 +55,9 @@ export class RoundBadge extends View {
     this.r = h('div', { class: 'rb-round' }); this.s = h('div', { class: 'rb-slots' });
     this.el.append(this.r, this.s);
   }
-  set(round, slots) {
+  set(round, slots, bonus = 0) {
     this.r.textContent = 'ROUND ' + round;
-    this.s.replaceChildren(h('b', {}, String(slots)), 'マス');
+    this.s.replaceChildren(h('b', {}, String(slots)), 'マス', ...(bonus ? [h('em', { class: 'rb-gift' }, `+${bonus}`)] : []));
     this.el.classList.remove('pop'); void this.el.offsetWidth; this.el.classList.add('pop');
   }
 }
@@ -108,6 +115,7 @@ export class SequenceTrack extends View {
     s.el.className = 'slot ' + o.state + ' ' + (o.flags || []).join(' ') + (o.icon ? ' a-' + o.icon : '');
     if (this.revFrom >= 0 && i > this.revFrom && o.state !== 'broken') s.el.classList.add('rev');
     if (this.cursor === i) s.el.classList.add('cursor');
+    if (s.gift) s.el.classList.add('gift');
     inner.replaceChildren();
     if (o.icon && o.state !== 'hidden' && o.state !== 'secret') inner.append(img(actionIcon(o.icon)));
     if (o.state === 'secret' || o.state === 'hidden') inner.textContent = '?';
@@ -127,6 +135,7 @@ export class SequenceTrack extends View {
     this.bracket.style.setProperty('--from', idx + 1);
     this.bracket.style.setProperty('--n', n);
   }
+  markGift(i) { const s = this.slots[i]; if (!s) return; s.gift = true; s.el.classList.add('gift'); }
   breakSlot(i) {
     const s = this.slots[i];
     if (!s) return;

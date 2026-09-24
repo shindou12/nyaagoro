@@ -101,3 +101,18 @@ export class Toast extends View {
   constructor() { super('Toast', { className: 'toast is-hidden' }); }
   say(text, ms = 2200) { this.el.textContent = text; this.show(); restart(this.el, 'in'); clearTimeout(this.tm); this.tm = setTimeout(() => this.hide(), ms); }
 }
+
+// A broken slot flies over to the opponent's name plate: "this one's yours next turn".
+export class GiftFly extends View {
+  constructor(stageEl) { super('GiftFly', { className: 'gift-layer' }); this.stage = stageEl; }
+  fly(fromRect, toRect, text = '+1') {
+    const s = this.stage.getBoundingClientRect();
+    const chip = h('div', { class: 'gift-chip' }, text);
+    const x0 = fromRect.x + fromRect.width / 2 - s.x, y0 = fromRect.y + fromRect.height / 2 - s.y;
+    const x1 = toRect.x + toRect.width / 2 - s.x, y1 = toRect.y + toRect.height / 2 - s.y;
+    chip.style.left = x0 + 'px'; chip.style.top = y0 + 'px';
+    this.el.append(chip);
+    requestAnimationFrame(() => requestAnimationFrame(() => { chip.style.transform = `translate(${x1 - x0}px, ${y1 - y0}px) scale(.8) rotate(360deg)`; chip.classList.add('go'); }));
+    setTimeout(() => chip.remove(), 1100);
+  }
+}

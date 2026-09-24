@@ -139,7 +139,7 @@ export class MatchPresenter {
       const pl = this.plate(slot);
       pl.setCat(this.breed(slot));
       pl.setName(this.name(slot), this.hot() ? (slot === 0 ? 'P1' : 'P2') : this.isMe(slot) ? 'YOU' : this.s.players[slot].cpu ? 'CPU' : 'RIVAL');
-      pl.setLives(f.lives[slot], START_LIVES); pl.setRole(null); pl.setActive(false); pl.setDanger(false);
+      pl.setLives(f.lives[slot], START_LIVES); pl.setRole(null); pl.setActive(false); pl.setDanger(false); pl.setGift(0);
       pl.show();
       const a = this.actor(slot);
       a.setBreed(this.breed(slot)); a.setBase('idle', this.now()); a.crown = false; a.alpha = 1; a.emote = null; a.reverse = false;
@@ -171,8 +171,14 @@ export class MatchPresenter {
     this.previewed.clear();
     this.timer = null;
     this.beatMs = f.beatMs;
-    r.round.show(); r.round.set(f.round, f.slots);
+    r.round.show(); r.round.set(f.round, f.slots, f.bonus || 0);
     r.track.show(); r.track.setup(f.slots); r.track.setMode('compose'); r.track.setCursor(-1);
+    this.plate(f.composer).setGift(0);
+    if (f.bonus) {
+      // ごろにゃーのおかえし: the gifted slot(s) land at the end of the track
+      for (let i = f.slots - f.bonus; i < f.slots; i++) r.track.markGift(i);
+      this.at(0.5, () => { this.sfx.ui('join'); });
+    }
     for (let i = 0; i < f.slots; i++) this.sfx.slotDrop(i, f.slots);
     r.timer.hide();
     r.revChip.set(false);
@@ -190,9 +196,10 @@ export class MatchPresenter {
     const pc = this.pos(C), pm = this.pos(M);
     r.roleTags.set(this.sideOf(C), this.isMe(C) ? 'キミが出題' : '出題', 'composer', pc.x, pc.y - 48);
     r.roleTags.set(this.sideOf(M), this.isMe(M) ? 'キミがまね' : 'まね', 'mimic', pm.x, pm.y - 48);
-    if (this.isMe(C)) r.banner.say('キミの出題！', { sub: `<b>${f.slots}マス</b>まで ヒミツで入力しよう`, style: 'you', ms: 1400 });
-    else if (this.hot()) r.banner.say(`${this.name(C)} の出題！`, { sub: `${this.name(M)}は 画面を見ないでね！`, style: 'you', ms: 1400 });
-    else r.banner.say(`${this.name(C)} の出題…`, { sub: 'ダンボールの中で たくらみ中', style: 'watch', ms: 1400 });
+    const giftSub = f.bonus ? `<em>ごろにゃーのおかえし +${f.bonus}マス！</em><br>` : '';
+    if (this.isMe(C)) r.banner.say('キミの出題！', { sub: `${giftSub}<b>${f.slots}マス</b>まで ヒミツで入力しよう`, style: 'you', ms: f.bonus ? 1500 : 1400 });
+    else if (this.hot()) r.banner.say(`${this.name(C)} の出題！`, { sub: `${giftSub}${this.name(M)}は 画面を見ないでね！`, style: 'you', ms: 1400 });
+    else r.banner.say(`${this.name(C)} の出題…`, { sub: `${giftSub}ダンボールの中で たくらみ中`, style: 'watch', ms: 1400 });
     r.pad.setMode(this.s.isLocal(C) ? 'wait' : 'wait', this.s.isLocal(C) ? 'まもなく入力スタート' : '');
     this.sfx.turnStart();
     this.bgm.setMode('calm');
@@ -267,6 +274,14 @@ export class MatchPresenter {
     if (this.secretFor(C)) { const p = this.pos(C); r.fx.burst(p.x, p.y - 20, 'dust', 10, 'goro'); r.bubbles.say(p.x, p.y - 44, 'できた！', 'small', 500); }
     r.track.setCursor(-1);
     this.sfx.lock();
+    if (f.gift) {
+      // the slot broken by ごろにゃー is handed to the opponent's next turn
+      const from = r.track.slots[this.slots - f.gift]?.el.getBoundingClientRect();
+      const to = this.plate(f.giftTo);
+      if (from) r.giftFly.fly(from, to.el.getBoundingClientRect(), `+${f.gift}`);
+      this.at(0.75, () => { to.setGift(f.gift); this.sfx.ui('ready'); });
+      r.toast.say(`こわれた${f.gift}マスは ${this.isMe(f.giftTo) ? 'キミ' : this.name(f.giftTo)} の次の出題へ！`, 2000);
+    }
     r.banner.say(f.reason === 'confirm' ? 'キメ！' : f.reason === 'timeout' ? 'タイムアップ！' : 'できあがり！', { style: 'info', ms: 500 });
   }
 
@@ -474,7 +489,7 @@ export class MatchPresenter {
   }
   spot(slot) { this.spotSide = this.sideOf(slot); }
   domToWorld(rect) {
-    const s = this.r.stage.el.getBoundingClientRect();
+    const s = this.r.worldWrap.el.getBoundingClientRect(); // the 320x180 world band
     return { x: (rect.x + rect.width / 2 - s.x) / s.width * 320, y: (rect.y + rect.height / 2 - s.y) / s.height * 180 };
   }
 

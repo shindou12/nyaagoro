@@ -227,16 +227,56 @@ img.swap { width: calc(var(--p)*10); height: calc(var(--p)*9); }
 .pb-confirm.enabled { --b: var(--yellow); background: #5a4a10; color: var(--yellow); }
 .pad:not([data-mode="compose"]) .pb-confirm { visibility: hidden; }
 
-/* portrait phones: pad docks under the stage with big thumb buttons */
-.portrait .stage { overflow: visible; margin-bottom: var(--pad-h); }
-.portrait .pad { bottom: auto; top: calc(100% + var(--p)*10); width: calc(var(--p)*316); transform: translateX(-50%); }
-.portrait .pad[data-mode="off"] { transform: translateX(-50%); opacity: 0; }
-.portrait .pad-btn { width: calc(var(--p)*100); height: calc(var(--p)*62); flex-direction: column; justify-content: center; gap: calc(var(--p)*2); }
-.portrait .pb-icon { width: calc(var(--p)*26); height: calc(var(--p)*26); }
-.portrait .pb-label { font-size: calc(var(--p)*13); }
-.portrait .pb-confirm { width: calc(var(--p)*80); height: calc(var(--p)*20); flex-direction: row; }
-.portrait .pad-combo { font-size: calc(var(--p)*6); }
-.portrait .pad-msg { font-size: calc(var(--p)*6); }
+/* ================================================================ portrait (tall 9:16 stage)
+   HUD on top · the alley (320x180 world band at --wt) in the middle · big thumb pad below */
+.portrait .stage { --band: calc(var(--p)*225); background: linear-gradient(180deg, #06041a 0, #0f0930 var(--wt), #141030 calc(var(--wt) + var(--band)), #0d0a22 100%); }
+/* the 320x180 world is shown 1.25x (400x225) and cropped at the sides so the cats are bigger */
+.portrait .world-wrap, .portrait [data-view="FxLayer"], .portrait .bubbles, .portrait .role-tags { top: var(--wt); bottom: auto; left: calc(var(--p)*-40); right: auto; width: calc(var(--p)*400); height: var(--band); }
+.portrait [data-view="FxLayer"] { position: absolute; }
+.portrait .world-wrap::after { content: ''; position: absolute; left: 0; right: 0; bottom: calc(var(--p)*-2); height: calc(var(--p)*2); background: linear-gradient(90deg, var(--pink), var(--cyan)); opacity: .6; }
+.portrait .round-badge { top: calc(var(--p)*34); }
+.portrait .hype { top: calc(var(--p)*47); }
+.portrait .track { top: calc(var(--p)*58); transform: translateX(-50%) scale(1.25); transform-origin: top center; }
+.portrait .timer { top: calc(var(--p)*88); width: calc(var(--p)*200); }
+.portrait .track.has-rev ~ .timer { top: calc(var(--p)*99); }
+.portrait .banner { top: auto; bottom: calc(100% - var(--wt) + var(--p)*4); }
+.portrait .rev-chip { bottom: auto; top: calc(var(--wt) + var(--band) + var(--p)*3); }
+.portrait .toast { bottom: auto; top: calc(var(--wt) + var(--band) - var(--p)*16); }
+.portrait .stamp { top: calc(var(--wt) - var(--p)*28); }
+.portrait .stamp .st-main { font-size: calc(var(--p)*24); }
+.portrait .hype-up { top: calc(var(--wt) + var(--p)*8); }
+.portrait .pad { top: calc(var(--wt) + var(--band) + var(--p)*30); bottom: calc(var(--p)*10); width: calc(var(--p)*308); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto minmax(0, 1fr); grid-template-areas: "mid mid" "nya goro"; gap: calc(var(--p)*5); align-items: stretch; }
+.portrait .pad[data-mode="off"] { transform: translate(-50%, calc(var(--p)*40)); }
+.portrait .pb-nya { grid-area: nya; } .portrait .pb-goro { grid-area: goro; }
+.portrait .pad-mid { grid-area: mid; flex-direction: row; justify-content: center; flex-wrap: wrap; gap: calc(var(--p)*3); min-height: calc(var(--p)*14); }
+.portrait .pad-btn { width: auto; height: 100%; max-height: calc(var(--p)*190); flex-direction: column; justify-content: center; gap: calc(var(--p)*4); }
+.portrait .pb-goro { flex-direction: column; }
+.portrait .pb-icon { width: calc(var(--p)*40); height: calc(var(--p)*40); }
+.portrait .pb-label { font-size: calc(var(--p)*16); }
+.portrait .pad-btn kbd { display: none; }
+.portrait .pb-hint { top: auto; bottom: calc(var(--p)*4); font-size: calc(var(--p)*6); }
+.portrait .pad-btn .lane { top: calc(var(--p)*4); height: calc(var(--p)*4); }
+.portrait .pb-confirm { height: calc(var(--p)*16); width: calc(var(--p)*70); flex-direction: row; }
+.portrait .pb-confirm .pb-label { font-size: calc(var(--p)*7); }
+.portrait .pad-combo, .portrait .pad-msg { font-size: calc(var(--p)*6); }
+.portrait .pad-msg:empty { display: none; }
+/* title in portrait: logo up top, cats in the band, big 2x2 menu below */
+.portrait .logo { top: calc(var(--wt) * .5 - var(--p)*40); }
+.portrait .logo-main { font-size: calc(var(--p)*40); }
+.portrait .name-row { top: auto; bottom: calc(100% - var(--wt) + var(--p)*4); }
+.portrait .menu-foot { top: calc(50% + (var(--wt) + var(--band)) / 2 + var(--p)*36); bottom: auto; }
+.portrait .menu-grid { bottom: auto; top: calc(50% + (var(--wt) + var(--band)) / 2 - var(--p)*52); grid-template-columns: 1fr 1fr; gap: calc(var(--p)*6); }
+.portrait .menu-grid .btn { min-width: calc(var(--p)*140); font-size: calc(var(--p)*9); padding: calc(var(--p)*5) calc(var(--p)*3); }
+.portrait .intro-cv, .portrait .res-trans { object-fit: cover; }
+.portrait .vs-side { width: 100%; height: 50%; top: auto; bottom: auto; clip-path: none; padding: 0; }
+.portrait .vs-l { top: 0; background: rgba(255, 62, 165, .85); }
+.portrait .vs-r { top: 50%; left: 0; background: rgba(67, 232, 255, .85); }
+.portrait .vs-mid { top: 50%; }
+.portrait .vs-foot { bottom: 3%; }
+.portrait .wait-panel .panel-card, .portrait .result-panel .panel-card, .portrait .small-panel .panel-card, .portrait .howto-panel .panel-card { zoom: 1.2; }
+.portrait .howto-panel .panel-card { max-width: calc(var(--p)*260); }
+.portrait .pcards { flex-direction: column; gap: calc(var(--p)*2); }
+.portrait .pcard { width: calc(var(--p)*200); }
 
 /* ---------------------------------------------------------------- overlay */
 .bubbles { position: absolute; inset: 0; }
@@ -458,3 +498,19 @@ kbd { font-family: inherit; background: #2a2258; color: #fff; padding: 0 calc(va
 @keyframes stampin2 { 0% { transform: scale(4); opacity: 0; } 60% { transform: scale(.9); opacity: 1; } 100% { transform: none; } }
 
 @media (prefers-reduced-motion: reduce) { .stage.shaking { animation: none; } }
+
+/* ---------------------------------------------------------------- ごろにゃーのおかえし (gifted slot) */
+.plate-gift { position: absolute; top: calc(var(--p)*-3); font-size: calc(var(--p)*4.5); background: var(--pink); color: #fff; padding: 0 calc(var(--p)*1.5); line-height: 1.4; white-space: nowrap; box-shadow: 0 0 calc(var(--p)*3) var(--pink); }
+.plate-l .plate-gift { right: calc(var(--p)*2); }
+.plate-r .plate-gift { left: calc(var(--p)*2); }
+.plate-gift.pop { animation: slotpop .35s steps(4); }
+.rb-gift { font-style: normal; color: #fff; background: var(--pink); font-size: calc(var(--p)*5); padding: 0 calc(var(--p)*1); margin-left: calc(var(--p)*1); }
+.slot.gift { --b: var(--pink); }
+.slot.gift::before { content: '+1'; position: absolute; top: calc(var(--p)*-5); left: calc(var(--p)*-2); font-size: calc(var(--p)*4); background: var(--pink); color: #fff; padding: 0 calc(var(--p)*.8); line-height: 1.2; }
+.slot.gift.cursor::before { content: '+1'; border: 0; bottom: auto; transform: none; animation: none; }
+.track.drop .slot.gift { animation: giftdrop .7s steps(8) both; animation-delay: calc(var(--i) * 60ms + 250ms); }
+@keyframes giftdrop { 0% { transform: translate(calc(var(--p)*60), calc(var(--p)*-30)) rotate(200deg) scale(.4); opacity: 0; } 70% { transform: translateY(calc(var(--p)*2)); opacity: 1; } 100% { transform: none; } }
+.gift-layer { position: absolute; inset: 0; pointer-events: none; }
+.gift-chip { position: absolute; transform: translate(0, 0); margin: calc(var(--p)*-7) 0 0 calc(var(--p)*-9); width: calc(var(--p)*18); height: calc(var(--p)*14); display: flex; align-items: center; justify-content: center;
+  background: var(--pink); color: #fff; font-size: calc(var(--p)*7); box-shadow: 0 0 calc(var(--p)*6) var(--pink), 0 0 0 var(--p) #fff; transition: transform .8s cubic-bezier(.5, -0.4, .4, 1.3); }
+.gift-chip.go { opacity: .95; }

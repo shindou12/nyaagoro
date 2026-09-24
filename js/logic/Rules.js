@@ -8,7 +8,8 @@ export const START_LIVES = 2;          // "2回ミスったら負け" → 2 fish
 export const BASE_SLOTS = 4;           // round 1 accepts 4 inputs
 export const MAX_SLOTS = 9;            // never longer than this (keeps it snappy)
 export const MIN_SEQ = 2;              // shortest sequence a composer may lock in
-export const GORONYA_BREAKS = 1;       // using ごろにゃー breaks 1 extra slot (受付数 -1)
+export const GORONYA_BREAKS = 1;       // using ごろにゃー breaks 1 extra slot (受付数 -1)…
+export const GIFT_MAX_SLOTS = 11;      // …and that slot is handed to the opponent's next compose turn
 
 export const T = Object.freeze({
   matchIntro: 3400,

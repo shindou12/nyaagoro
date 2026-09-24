@@ -2,7 +2,7 @@
 // same-device play). It knows nothing about rendering: it consumes player
 // actions + a clock and emits *facts* (what happened in the game).
 import {
-  ACT, START_LIVES, MIN_SEQ, T, slotsForRound, roundForTurn, composeTimeMs,
+  ACT, START_LIVES, MIN_SEQ, T, GORONYA_BREAKS, GIFT_MAX_SLOTS, slotsForRound, roundForTurn, composeTimeMs,
   capacityOf, composeRejectReason, expectedAt, reverseFrom, hypeFor, beatMs, showcaseBeats,
 } from './Rules.js';
 
@@ -17,6 +17,7 @@ export class MatchLogic {
     this.seq = [];
     this.pads = [];
     this.replayIdx = 0;
+    this.gift = [0, 0]; // extra slots waiting for each player's next compose turn
     this.stats = [0, 1].map(() => ({ clears: 0, misses: 0, goronya: 0, goronyaClears: 0, longest: 0, composed: 0, stumped: 0 }));
     this.onFact = () => {};
   }
@@ -36,7 +37,11 @@ export class MatchLogic {
     this.round = roundForTurn(this.turnNo);
     this.composer = (this.first + this.turnNo - 1) % 2;
     this.replayer = 1 - this.composer;
-    this.slots = slotsForRound(this.round);
+    const base = slotsForRound(this.round);
+    const bonus = this.gift[this.composer];
+    this.gift[this.composer] = 0;
+    this.slots = Math.min(GIFT_MAX_SLOTS, base + bonus);
+    this.bonus = this.slots - base;
     this.seq = [];
     this.pads = [];
     this.replayIdx = 0;
@@ -45,7 +50,7 @@ export class MatchLogic {
     const hype = this.hype;
     this.emit({
       type: 'turnStart', turn: this.turnNo, round: this.round, composer: this.composer, replayer: this.replayer,
-      slots: this.slots, hype, beatMs: beatMs(hype), lives: [...this.lives], durMs: T.turnIntro,
+      slots: this.slots, bonus: this.bonus, hype, beatMs: beatMs(hype), lives: [...this.lives], durMs: T.turnIntro,
     });
   }
 
@@ -65,8 +70,13 @@ export class MatchLogic {
     this.phase = 'lockPause';
     this.until = now + T.lockPause;
     this.stats[this.composer].composed += 1;
-    if (this.seq.includes(ACT.GORONYA)) this.stats[this.composer].goronya += 1;
-    this.emit({ type: 'composeLock', turn: this.turnNo, seq: [...this.seq], pads: [...this.pads], reason });
+    let gift = 0;
+    if (this.seq.includes(ACT.GORONYA)) {
+      this.stats[this.composer].goronya += 1;
+      gift = GORONYA_BREAKS;
+      this.gift[this.replayer] += gift; // the broken slot becomes the opponent's next turn
+    }
+    this.emit({ type: 'composeLock', turn: this.turnNo, seq: [...this.seq], pads: [...this.pads], reason, gift, giftTo: this.replayer });
   }
 
   openShowcase(now) {
