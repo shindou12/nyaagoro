@@ -1,0 +1,21 @@
+{
+  "name": "nyagoro",
+  "version": "1.0.0",
+  "description": "にゃごろ！ — ネオン路地裏まねっこバトル。猫の「にゃー」「ごろ」「ごろにゃー」をまねし合う、友だち向け部屋ID制オンライン対戦ゲーム。",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "node tools/logic-test.mjs",
+    "e2e": "node tools/e2e.mjs"
+  },
+  "dependencies": {
+    "ws": "^8.21.3"
+  },
+  "devDependencies": {
+    "@fontsource/dotgothic16": "^5.3.0",
+    "peerjs": "^1.5.5",
+    "playwright-core": "^1.63.0"
+  },
+  "license": "MIT"
+}

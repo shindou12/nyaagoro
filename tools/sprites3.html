@@ -1,0 +1,12 @@
+<!doctype html><html><body style="background:#140f33;margin:0">
+<canvas id="c" width="240" height="96" style="width:1440px;height:576px;image-rendering:pixelated"></canvas>
+<script type="module">
+import { bigCat } from '../js/art/catArt.js';
+const ctx = document.getElementById('c').getContext('2d');
+ctx.fillStyle = '#231a4a'; ctx.fillRect(0,0,240,96);
+const q = new URLSearchParams(location.search);
+const id = q.get('id') || 'tama';
+const poses = [{pose:'sit'}, {pose:'sit', eyes:'happy', mouth:'nya', hy:-2, ears:'perk', paws:'upL'},{pose:'sit', eyes:'tear', mouth:'wavy', ears:'flat', tailMode:'down', squash:1},{pose:'sit', eyes:'wide', mouth:'o', ears:'back', paws:'chest'},{pose:'belly', eyes:'happy', mouth:'nya'},
+{pose:'ball', eyes:'closed'},{pose:'stand', eyes:'happy', mouth:'grin', arms:'up'},{pose:'loaf', eyes:'closed', mouth:'w', ears:'side'},{pose:'sit', eyes:'wink', mouth:'w', blush:true, paws:'wave'},{pose:'sit', eyes:'focus', mouth:'smug', look:1}];
+poses.forEach((p, i) => ctx.drawImage(bigCat(id, p, false), (i%5) * 48, Math.floor(i/5)*48));
+</script></body></html>

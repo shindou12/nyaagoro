@@ -1,0 +1,23 @@
+<!doctype html><html><body style="background:#140f33;margin:0">
+<canvas id="c" width="640" height="360" style="width:1280px;height:720px;image-rendering:pixelated"></canvas>
+<script type="module">
+import { bigCat, smallCat, PLAYER_CATS, AUDIENCE_BREEDS, backHead } from '../js/art/catArt.js';
+const ctx = document.getElementById('c').getContext('2d');
+ctx.fillStyle = '#231a4a'; ctx.fillRect(0,0,640,360);
+const poses = [
+ {pose:'sit'}, {pose:'sit', eyes:'happy', mouth:'nya', hy:-2, ears:'perk', paws:'upL'},
+ {pose:'sit', eyes:'tear', mouth:'wavy', ears:'flat', tailMode:'down', squash:1},
+ {pose:'sit', eyes:'wide', mouth:'o', ears:'back', paws:'chest'},
+ {pose:'stand', eyes:'happy', mouth:'grin', arms:'up'},
+ {pose:'loaf', eyes:'closed', mouth:'w', ears:'side'},
+ {pose:'ball', eyes:'closed'}, {pose:'ball', eyes:'closed', rot:1}, {pose:'ball', eyes:'squeeze', rot:2},
+ {pose:'belly', eyes:'happy', mouth:'nya'},
+ {pose:'sit', eyes:'star', mouth:'grin', paws:'upBoth'},
+ {pose:'sit', eyes:'focus', mouth:'smug', look:1},
+ {pose:'sit', eyes:'wink', mouth:'w', blush:true, paws:'wave'},
+];
+PLAYER_CATS.forEach((id, r) => {
+  if (r > 7) return;
+  poses.forEach((p, i) => ctx.drawImage(bigCat(id, p, false), 2 + i * 46 + (r%2)*0, 2 + r * 44));
+});
+</script></body></html>
