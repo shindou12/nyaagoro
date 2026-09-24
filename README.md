@@ -82,7 +82,9 @@ npm start            # → http://localhost:8080
 - 序盤は相手の魚1匹・短い出題で勝ちやすく、終盤に向けて段階的に強くなる
 - 負けたら「もう一回」かマップへ。クリア状況はブラウザに保存。最終話のあとにエンディング
 - 会話は クリック / タップ / Space で進む、Esc か「スキップ」で飛ばせる
-- 台本・演出の指示・難易度は `js/story/StoryData.js`
+- プロローグで師匠に名前を聞かれ、そこで自分の名前を入力する
+- 最終話のあと、BGMのエクステンド版に乗せたエンディング映像（路地裏→摩天楼→オープニングの猫の目→満月）
+- 台本・演出の指示・難易度は `js/story/StoryData.js`、エンディング映像は `js/views/transition/EndingCinematic.js`
 
 ## テスト
 
@@ -91,6 +93,7 @@ npm test             # ルールのユニットテスト（Node のみ）
 npm start &          # 以下はサーバー起動中に
 npm run e2e          # 2つのブラウザで 部屋作成→参加→試合→再戦→切断→再入室→エラー表示 を自動検証
 node tools/story.mjs <出力先>   # ストーリー：ステージ1を実戦でクリア→最終ステージ→エンディングまで
+node tools/record-ending.mjs <出力先>   # エンディングを音付きMP4に録画（pip install imageio-ffmpeg が必要）
 ```
 e2e とスクリーンショット系ツール（`tools/*.mjs`）は `playwright-core` と Chromium を使います。
 `tools/gallery.html` を開くと、全猫 × 全ポーズのスプライト一覧が見られます。

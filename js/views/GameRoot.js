@@ -24,6 +24,7 @@ import { SpeechBubbles, SuccessEffect, MissEffect, CrowdHypeEffect, SpecialActio
 import { TitleMenu, RoomCreatePanel, RoomJoinPanel, WaitingRoomPanel, ResultPanel, HowToPanel, DisconnectPanel } from './modal/Panels.js';
 import { IntroZoom, MatchStartTransition, ResultTransition } from './transition/Transitions.js';
 import { StoryMapPanel, DialogueView } from './modal/Story.js';
+import { EndingCinematic } from './transition/EndingCinematic.js';
 
 export const CAT_POS = { L: { x: 84, y: 150 }, R: { x: 236, y: 150 } };
 
@@ -95,6 +96,7 @@ export class GameRoot extends View {
     this.intro = this.transition.add(new IntroZoom());
     this.vs = this.transition.add(new MatchStartTransition());
     this.resultTrans = this.transition.add(new ResultTransition());
+    this.credits = this.transition.add(new EndingCinematic());
 
     this.fit();
     window.addEventListener('resize', () => this.fit());

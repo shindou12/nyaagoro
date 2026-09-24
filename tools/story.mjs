@@ -16,7 +16,7 @@ await p.waitForTimeout(600); await p.keyboard.press('x'); await p.waitForTimeout
 await shot('s0-title');
 await p.click('[data-view="Button:story"]'); await p.waitForTimeout(600); await shot('s1-map');
 await p.click('.stage-card.next'); await p.waitForTimeout(1200); await shot('s2a-card');
-for (let i = 0; i < 120 && (await st()).s === 'dialogue'; i++) { await p.keyboard.press('Space'); await p.waitForTimeout(260); if (i === 6) await shot('s2b-flashback'); if (i === 30) await shot('s2c-notice'); }
+for (let i = 0; i < 120 && (await st()).s === 'dialogue'; i++) { if (await p.$('.dlg-name-in')) { await p.fill('.dlg-name-in', 'テスト'); await p.keyboard.press('Enter'); await p.waitForTimeout(300); } await p.keyboard.press('Space'); await p.waitForTimeout(260); if (i === 6) await shot('s2b-flashback'); if (i === 30) await shot('s2c-notice'); }
 console.log('after pre:', (await st()).s);
 // play stage 1 for real
 const chord = async () => { await p.keyboard.down('f'); await p.keyboard.down('j'); await p.waitForTimeout(30); await p.keyboard.up('f'); await p.keyboard.up('j'); };
@@ -53,10 +53,10 @@ console.log('final match:', (await st()).s);
 // fake a win to walk the ending
 await p.evaluate(() => { const m = window.__nyagoro.mediator; m.session.stopMatch(); m.storyResult({ winner: 0 }); });
 await p.waitForTimeout(800); await shot('s7-final-win');
-for (let i = 0; i < 30; i++) { if (await p.evaluate(() => !document.querySelector('.dlg-card').classList.contains('is-hidden'))) break; await p.keyboard.press('Space'); await p.waitForTimeout(200); await p.keyboard.press('Space'); await p.waitForTimeout(900); if (i === 7) await shot('s8-ending-a'); if (i === 10) await shot('s9-ending-b'); }
+for (let i = 0; i < 30; i++) { if ((await st()).s === 'credits') break; await p.keyboard.press('Space'); await p.waitForTimeout(200); await p.keyboard.press('Space'); await p.waitForTimeout(900); if (i === 7) await shot('s8-ending-a'); if (i === 10) await shot('s9-ending-b'); }
 await p.waitForTimeout(1500); await shot('s10-card');
 s = await st(); console.log('end state', s.s, 'cleared', s.cleared);
-if ((await st()).s === 'dialogue') { await p.click('.dlg-card'); await p.waitForTimeout(800); }
+if ((await st()).s === 'credits') { await p.click('.end-skip'); await p.waitForTimeout(800); }
 console.log('after card', (await st()).s);
 await shot('s11-title-cleared');
 console.log(errs.length ? 'ERRORS ' + errs.length : 'no errors');

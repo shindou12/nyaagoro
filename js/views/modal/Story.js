@@ -91,6 +91,18 @@ export class DialogueView extends View {
     this.emit('dlg:char', { who });
   }
   isTyping() { return this.typing; }
+  /** name entry inside the dialogue box (the master asks your name) */
+  askName(current) {
+    this.more.classList.add('is-hidden');
+    const input = h('input', { class: 'name-in dlg-name-in', maxLength: 8, value: current || '', spellcheck: false, autocomplete: 'off', placeholder: 'なまえ' });
+    const ok = h('button', { type: 'button', class: 'btn pink small' }, 'これが わたしの名前');
+    const send = (e) => { e && e.stopPropagation(); this.emit('ui:click', { id: 'name', name: input.value }); };
+    ok.addEventListener('click', send);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(e); });
+    input.addEventListener('click', (e) => e.stopPropagation());
+    this.choices.replaceChildren(h('div', { class: 'dlg-ask' }, input, ok));
+    setTimeout(() => { input.focus(); input.select(); }, 60);
+  }
   finish() { this.shown = this.full.length; this.textEl.textContent = this.full; this.typing = false; this.more.classList.remove('is-hidden'); }
   ask(options) {
     this.more.classList.add('is-hidden');

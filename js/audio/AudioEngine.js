@@ -38,6 +38,7 @@ export class AudioEngine {
     const comp = c.createDynamicsCompressor();
     comp.threshold.value = -14; comp.knee.value = 10; comp.ratio.value = 4; comp.attack.value = 0.004; comp.release.value = 0.18;
     this.master.connect(comp).connect(c.destination);
+    this.comp = comp; // tap point for recording
 
     // reverb send (generated impulse — alley echo)
     this.reverb = c.createConvolver();
