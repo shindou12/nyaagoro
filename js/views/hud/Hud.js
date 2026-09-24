@@ -86,7 +86,7 @@ export class SequenceTrack extends View {
   }
   setup(n) {
     this.slots = Array.from({ length: n }, (_, i) => {
-      const el = h('div', { class: 'slot empty' }, h('div', { class: 'slot-in' }), h('div', { class: 'slot-sub' }));
+      const el = h('div', { class: 'slot empty' }, h('div', { class: 'slot-in' }), h('div', { class: 'lane' }, h('i', { class: 'lane-l' }), h('i', { class: 'lane-r' })), h('div', { class: 'slot-sub' }));
       el.style.setProperty('--i', i);
       return { el, state: 'empty' };
     });
@@ -179,7 +179,7 @@ export class InputPad extends View {
     super('InputPad', { className: 'pad' });
     const mk = (key, label, keys) => {
       const b = h('button', { class: 'pad-btn pb-' + key, type: 'button' },
-        h('span', { class: 'pb-hint' }), img(actionIcon(key === 'confirm' ? 'nya' : key), 'pb-icon'), h('span', { class: 'pb-label' }, label), h('kbd', {}, keys));
+        h('span', { class: 'pb-hint' }), h('div', { class: 'lane' }, h('i', { class: 'lane-l' }), h('i', { class: 'lane-r' })), img(actionIcon(key === 'confirm' ? 'nya' : key), 'pb-icon'), h('span', { class: 'pb-label' }, label), h('kbd', {}, keys));
       if (key === 'confirm') { b.querySelector('.pb-icon').remove(); b.prepend(h('span', { class: 'pb-ok' }, '✓')); }
       const down = (e) => { e.preventDefault(); b.setPointerCapture?.(e.pointerId); this.emit('pad:down', { key }); };
       const up = (e) => { e.preventDefault(); this.emit('pad:up', { key }); };
