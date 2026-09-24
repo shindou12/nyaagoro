@@ -10,7 +10,7 @@
 // │  ├─ OverlayLayer        : FxCanvas, BeatPulse, ScreenFx, SpeechBubbles, SuccessEffect,
 // │  │                        MissEffect, CrowdHypeEffect, SpecialActionEffect, Toast
 // │  ├─ ModalLayer          : TitleMenu, RoomCreatePanel, RoomJoinPanel, WaitingRoomPanel,
-// │  │                        ResultPanel, HowToPanel, DisconnectPanel
+// │  │                        ResultPanel, HowToPanel, DisconnectPanel, StoryMapPanel, DialogueView
 // │  └─ TransitionLayer     : IntroZoom, MatchStartTransition, ResultTransition
 //
 // Views bubble events up to here; GameRoot hands them to its sink (the Mediator).
@@ -23,6 +23,7 @@ import { FxCanvas } from './overlay/FxCanvas.js';
 import { SpeechBubbles, SuccessEffect, MissEffect, CrowdHypeEffect, SpecialActionEffect, BeatPulse, ScreenFx, Toast, GiftFly } from './overlay/Overlay.js';
 import { TitleMenu, RoomCreatePanel, RoomJoinPanel, WaitingRoomPanel, ResultPanel, HowToPanel, DisconnectPanel } from './modal/Panels.js';
 import { IntroZoom, MatchStartTransition, ResultTransition } from './transition/Transitions.js';
+import { StoryMapPanel, DialogueView } from './modal/Story.js';
 
 export const CAT_POS = { L: { x: 84, y: 150 }, R: { x: 236, y: 150 } };
 
@@ -86,6 +87,8 @@ export class GameRoot extends View {
     this.resultPanel = this.modal.add(new ResultPanel());
     this.howto = this.modal.add(new HowToPanel());
     this.discPanel = this.modal.add(new DisconnectPanel());
+    this.storyMap = this.modal.add(new StoryMapPanel());
+    this.dialogue = this.modal.add(new DialogueView());
 
     // ---- transitions
     this.transition = this.stage.add(new DomLayer('TransitionLayer', 'transition'));

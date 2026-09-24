@@ -69,6 +69,8 @@ export class Bgm {
     if (this.mode === 'title') lv = [0.9, 0.7, 0.5, 0, 0];
     if (this.mode === 'lobby') lv = [0.9, 0.7, 0.7, 0.45, 0];
     if (this.mode === 'result') lv = [0.9, 0.8, 0.9, 0.8, 0.9];
+    if (this.mode === 'story') lv = [0.85, 0.55, 0, 0.35, 0];
+    if (this.mode === 'ending') lv = [0.75, 0, 0, 0.3, 0];
     return lv;
   }
   applyLevels(now) {

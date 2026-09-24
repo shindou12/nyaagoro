@@ -52,7 +52,6 @@ export class MatchPresenter {
   name(slot) { return this.s.players[slot].name || (slot ? 'P2' : 'P1'); }
   breed(slot) { return this.s.players[slot].cat || 'tama'; }
   isMe(slot) { return this.s.isLocal(slot) && this.s.mode !== 'local'; }
-  hot() { return this.s.mode === 'local'; }
   secretFor(composer) { return !this.s.isLocal(composer); }
   at(delay, fn) { this.timeline.push({ at: this.now() + delay, fn }); }
   voiceOf(slot) { const b = BREEDS[this.breed(slot)]; return [b.voice, b.pitch]; }
@@ -138,7 +137,7 @@ export class MatchPresenter {
     [L, R].forEach((slot) => {
       const pl = this.plate(slot);
       pl.setCat(this.breed(slot));
-      pl.setName(this.name(slot), this.hot() ? (slot === 0 ? 'P1' : 'P2') : this.isMe(slot) ? 'YOU' : this.s.players[slot].cpu ? 'CPU' : 'RIVAL');
+      pl.setName(this.name(slot), this.isMe(slot) ? 'YOU' : this.s.players[slot].cpu ? 'CPU' : 'RIVAL');
       pl.setLives(f.lives[slot], START_LIVES); pl.setRole(null); pl.setActive(false); pl.setDanger(false); pl.setGift(0);
       pl.show();
       const a = this.actor(slot);
@@ -151,10 +150,10 @@ export class MatchPresenter {
     this.S.reverse = false;
     r.fx.confettiRate = 0;
     const first = f.first;
-    const firstName = this.hot() ? this.name(first) : this.isMe(first) ? 'キミ' : this.name(first);
+    const firstName = this.isMe(first) ? 'キミ' : this.name(first);
     r.vs.play({
-      left: { name: this.name(L), breed: this.breed(L), tag: this.hot() ? 'P1' : 'YOU' },
-      right: { name: this.name(R), breed: this.breed(R), tag: this.hot() ? 'P2' : this.s.players[R].cpu ? 'CPU' : 'RIVAL' },
+      left: { name: this.name(L), breed: this.breed(L), tag: 'YOU' },
+      right: { name: this.name(R), breed: this.breed(R), tag: this.s.players[R].cpu ? 'CPU' : 'RIVAL' },
       firstText: `先攻は <b>${firstName}</b> の出題から！`,
     });
     this.sfx.matchStart();
@@ -198,7 +197,6 @@ export class MatchPresenter {
     r.roleTags.set(this.sideOf(M), this.isMe(M) ? 'キミがまね' : 'まね', 'mimic', pm.x, pm.y - 48);
     const giftSub = f.bonus ? `<em>ごろにゃーのおかえし +${f.bonus}マス！</em><br>` : '';
     if (this.isMe(C)) r.banner.say('キミの出題！', { sub: `${giftSub}<b>${f.slots}マス</b>まで ヒミツで入力しよう`, style: 'you', ms: f.bonus ? 1500 : 1400 });
-    else if (this.hot()) r.banner.say(`${this.name(C)} の出題！`, { sub: `${giftSub}${this.name(M)}は 画面を見ないでね！`, style: 'you', ms: 1400 });
     else r.banner.say(`${this.name(C)} の出題…`, { sub: `${giftSub}ダンボールの中で たくらみ中`, style: 'watch', ms: 1400 });
     r.pad.setMode(this.s.isLocal(C) ? 'wait' : 'wait', this.s.isLocal(C) ? 'まもなく入力スタート' : '');
     this.sfx.turnStart();
@@ -212,7 +210,7 @@ export class MatchPresenter {
     r.timer.show(); r.timer.set(1, false);
     r.track.setCursor(0);
     if (this.s.isLocal(C)) {
-      r.pad.setMode('compose', this.hot() ? `${this.name(C)} の入力中` : 'ヒミツで入力中…');
+      r.pad.setMode('compose', 'ヒミツで入力中…');
       r.pad.setConfirm(false); r.pad.setComboEnabled(true);
       this.sfx.yourTurn();
       this.actor(C).setBase('think', this.now());
@@ -343,9 +341,9 @@ export class MatchPresenter {
     this.actor(M).setBase('ready', this.now()); this.actor(C).setBase('watch', this.now());
     this.spot(M);
     if (this.s.isLocal(M)) {
-      r.pad.setMode('replay', this.hot() ? `${this.name(M)} の番！` : 'まねして入力！');
+      r.pad.setMode('replay', 'まねして入力！');
       r.pad.setComboEnabled(true);
-      r.banner.say(this.hot() ? `${this.name(M)}、まねして！` : 'まねして！', { sub: this.revFrom >= 0 ? `${iconImg('goronya', 'mini')} のあとは <em>にゃー⇄ごろ</em> ぎゃく！` : '同じ順番で入力！', style: 'mimic', ms: 1100 });
+      r.banner.say('まねして！', { sub: this.revFrom >= 0 ? `${iconImg('goronya', 'mini')} のあとは <em>にゃー⇄ごろ</em> ぎゃく！` : '同じ順番で入力！', style: 'mimic', ms: 1100 });
       this.sfx.yourTurn();
     } else {
       r.pad.setMode('wait', `${this.name(M)} がまね中…`);
@@ -440,7 +438,7 @@ export class MatchPresenter {
       this.lives = [...f.lives];
       this.at(1.2, () => {
         [0, 1].forEach((s) => this.plate(s).setDanger(f.lives[s] === 1));
-        const localDanger = this.s.localSlots.some((s) => f.lives[s] === 1) && !this.hot();
+        const localDanger = this.s.localSlots.some((s) => f.lives[s] === 1);
         r.screenFx.setDanger(localDanger);
         this.plate(M).setExpr(f.lives[M] <= 1 ? { eyes: 'tear', mouth: 'wavy', ears: 'flat' } : {});
       });
@@ -460,7 +458,7 @@ export class MatchPresenter {
     this.actor(W).setBase('win', t); this.actor(W).crown = true;
     this.actor(Lz).setBase('lose', t); this.actor(Lz).emote = { kind: 'cloud', until: t + 99 };
     this.spot(W);
-    const youWon = this.hot() ? null : this.s.isLocal(W);
+    const youWon = this.s.isLocal(W);
     r.resultTrans.play('しょうぶあり！', `${this.name(W)} の勝ち！`, youWon !== false);
     r.screenFx.flash('#ffffff', 400);
     this.S.mood = 'cheer'; this.S.moodUntil = t + 4;

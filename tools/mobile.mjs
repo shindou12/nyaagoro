@@ -8,7 +8,7 @@ for (const [name, vp] of [['portrait', { width: 390, height: 844 }], ['landscape
   await p.goto('http://localhost:8080/');
   await p.waitForTimeout(700); await p.tap('body'); await p.waitForTimeout(3600);
   await p.screenshot({ path: `${out}/m-${name}-title.png` });
-  await p.tap('[data-view="Button:local"]'); await p.waitForTimeout(500);
+  await p.tap('[data-view="Button:cpu"]'); await p.waitForTimeout(500);
   await p.screenshot({ path: `${out}/m-${name}-wait.png` });
   await p.tap('[data-view="Button:start"]'); await p.waitForTimeout(5500);
   await p.tap('.pb-nya'); await p.waitForTimeout(300); await p.tap('.pb-goro'); await p.waitForTimeout(300);

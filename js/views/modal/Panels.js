@@ -43,14 +43,15 @@ export class TitleMenu extends Panel {
     this.card.append(grid);
     this.createBtn = this.button('create', '<b>部屋をつくる</b><small>友だちを招待</small>', 'big pink', grid);
     this.joinBtn = this.button('join', '<b>部屋に入る</b><small>部屋IDで参加</small>', 'big cyan', grid);
-    this.button('cpu', '<b>CPUと練習</b><small>師匠ネコと1本勝負</small>', 'mid', grid);
-    this.button('local', '<b>1台でふたり</b><small>交代で遊ぶ</small>', 'mid', grid);
+    this.button('cpu', '<b>CPUと練習</b><small>ノラ猫と1本勝負</small>', 'mid', grid);
+    this.storyBtn = this.button('story', '<b>ストーリー</b><small>さいごの満月</small>', 'mid story-btn', grid);
     const foot = h('div', { class: 'menu-foot' });
     this.card.append(foot);
     this.button('howto', 'あそびかた', 'small', foot);
     this.muteBtn = this.button('mute', '♪ ON', 'small', foot);
   }
   setName(n) { this.nameIn.value = n; }
+  setStory(cleared, total) { this.storyBtn.setLabel(`<b>ストーリー</b><small>${cleared >= total ? '★ クリア！' : `さいごの満月 ${cleared}/${total}`}</small>`); }
   setOnline(on) {
     if (on) return;
     this.createBtn.setLabel('<b>部屋をつくる</b><small>サイト版で遊べます</small>'); this.createBtn.setEnabled(false);

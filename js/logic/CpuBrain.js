@@ -3,7 +3,8 @@
 import { ACT, expectedAt, isReversedIndex, composeRejectReason, capacityOf } from './Rules.js';
 
 export class CpuBrain {
-  constructor(playerId, submit, { skill = 0.5 } = {}) {
+  constructor(playerId, submit, { skill = 0.5, goronya = 0.55 } = {}) {
+    this.goronyaRate = goronya;
     this.id = playerId;
     this.submit = submit;
     this.skill = skill;
@@ -22,7 +23,7 @@ export class CpuBrain {
 
   compose(slots) {
     const seq = [];
-    const useGoronya = Math.random() < 0.55;
+    const useGoronya = Math.random() < this.goronyaRate;
     const gAt = 1 + Math.floor(Math.random() * Math.max(1, slots - 2));
     let t = 700 + Math.random() * 600;
     const plan = [];
@@ -44,7 +45,8 @@ export class CpuBrain {
     for (let i = 0; i < seq.length; i++) {
       let a = expectedAt(seq, i);
       const rev = isReversedIndex(seq, i);
-      const pErr = 0.012 + i * 0.012 * (1.2 - this.skill) + (rev ? 0.05 : 0);
+      const k = 1.15 - this.skill; // lower skill → more slips, worse with length and in the reverse zone
+      const pErr = 0.004 + (1 - this.skill) * 0.07 + i * 0.013 * k + (rev ? 0.07 * k : 0);
       if (Math.random() < pErr && a !== ACT.GORONYA) a = a === ACT.NYA ? ACT.GORO : ACT.NYA;
       this.later(t, () => this.submit(a));
       t += 330 + Math.random() * 420 + (rev ? 250 : 0);

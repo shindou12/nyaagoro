@@ -17,6 +17,7 @@ export class SceneParams {
     this.moodUntil = 0;
     this.focus = 0;         // -1 left cat, +1 right, 0 none (audience looks)
     this.flash = 0;
+    this.dim = 0;           // 0..1 lights going out (story ending)
   }
 }
 
@@ -42,6 +43,7 @@ export class AlleyBackground extends CanvasView {
     // windows light up with hype; some have cats peeking
     for (const w of WINDOWS) {
       if (S.hypeShown + 0.001 < w.tier) continue;
+      if (S.dim > 0 && ((w.x * 13 + w.y * 7) % 100) / 100 < S.dim * 1.2) continue;
       const fl = Math.sin(t * 3 + w.x) > 0.97 ? 0.6 : 1;
       ctx.globalAlpha = 0.85 * fl;
       ctx.fillStyle = w.col; ctx.fillRect(w.x, w.y, w.w, w.h);
@@ -77,18 +79,18 @@ export class NeonSigns extends CanvasView {
   }
   draw(ctx, t) {
     const S = this.S;
-    const power = 0.55 + S.hypeShown * 0.12;
+    const power = (0.55 + S.hypeShown * 0.12) * (1 - S.dim * 0.97);
     this.signs.forEach((s, i) => {
       const lit = this.isLit(s, i, t);
       const useAlt = S.reverseK > 0.5 && s.sprAlt;
       const spr = useAlt ? s.sprAlt : s.spr, glow = useAlt ? s.glowAlt : s.glow;
       if (s.backing) { ctx.fillStyle = '#0c0820'; ctx.fillRect(s.x - 1, s.y - 1, spr.width + 2, spr.height + 2); }
-      if (lit <= 0) { ctx.globalAlpha = 0.25; ctx.drawImage(spr, s.x, s.y); ctx.globalAlpha = 1; return; }
+      if (lit <= 0 || S.dim > 0.98) { ctx.globalAlpha = 0.25 * (1 - S.dim * 0.6); ctx.drawImage(spr, s.x, s.y); ctx.globalAlpha = 1; return; }
       ctx.globalCompositeOperation = 'lighter';
       ctx.globalAlpha = Math.min(1, lit * power);
       ctx.drawImage(glow, s.x - glow.pad, s.y - glow.pad);
       ctx.globalCompositeOperation = 'source-over';
-      ctx.globalAlpha = 0.35 + lit * 0.65;
+      ctx.globalAlpha = (0.35 + lit * 0.65) * (1 - S.dim * 0.8);
       ctx.drawImage(spr, s.x, s.y);
       ctx.globalAlpha = 1;
       s._lit = lit; s._spr = spr;

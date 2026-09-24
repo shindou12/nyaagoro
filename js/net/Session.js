@@ -10,9 +10,10 @@ const noop = () => {};
 
 export class Session {
   /**
-   * @param {'host'|'guest'|'cpu'|'local'} mode
+   * @param {'host'|'guest'|'cpu'} mode   (cpu = practice or story; opts.opponent overrides the CPU cat)
    */
-  constructor(mode, transport, me) {
+  constructor(mode, transport, me, opts = {}) {
+    this.opts = opts;
     this.mode = mode;
     this.t = transport;
     this.isHost = mode !== 'guest';
@@ -22,9 +23,11 @@ export class Session {
       { name: '', cat: null, ready: false, present: false },
     ];
     if (mode === 'guest') this.players = [{ name: '', cat: null, ready: false, present: false }, { name: me.name, cat: me.cat, ready: false, present: true }];
-    if (mode === 'cpu') this.players[1] = { name: '師匠ネコ', cat: pickOther(me.cat), ready: true, present: true, cpu: true };
-    if (mode === 'local') this.players[1] = { name: 'P2', cat: pickOther(me.cat), ready: true, present: true };
-    this.localSlots = mode === 'host' || mode === 'cpu' ? [0] : mode === 'guest' ? [1] : [0, 1];
+    if (mode === 'cpu') {
+      const op = opts.opponent || {};
+      this.players[1] = { name: op.name || 'ノラ猫', cat: op.cat || pickOther(me.cat), ready: true, present: true, cpu: true };
+    }
+    this.localSlots = mode === 'guest' ? [1] : [0];
     this.votes = [false, false];
     this.lastFirst = Math.random() < 0.5 ? 1 : 0;
     this.inMatch = false;
@@ -146,7 +149,7 @@ export class Session {
       this.onFact(f);
       if (f.type === 'matchEnd') { this.inMatch = false; if (this.mode === 'cpu') setTimeout(() => { this.votes[1] = true; this.onRematch(this.votes); }, 1800 + Math.random() * 1500); }
     };
-    if (this.mode === 'cpu') this.bot = new CpuBrain(1, (a) => this.logic && this.logic.input(1, a, performance.now()), { skill: 0.55 });
+    if (this.mode === 'cpu') this.bot = new CpuBrain(1, (a) => this.logic && this.logic.input(1, a, performance.now()), { skill: this.opts.opponent?.skill ?? 0.55, goronya: this.opts.opponent?.goronya ?? 0.55 });
     if (this.net) this.send({ t: 'start', first });
     this.onStart({ first });
     this.logic.start(performance.now());
@@ -167,7 +170,6 @@ export class Session {
 
   voteRematch(slot, on = true) {
     this.votes[slot] = on;
-    if (this.mode === 'local') { this.votes = [true, true]; }
     if (this.isHost) this.checkRematch();
     else { this.send({ t: 'rematch', on }); this.onRematch(this.votes); }
   }
@@ -178,7 +180,7 @@ export class Session {
   }
   backToLobby() {
     this.stopMatch();
-    this.players.forEach((p, i) => { if (!p.cpu && !(this.mode === 'local' && i === 1)) p.ready = false; });
+    this.players.forEach((p, i) => { if (!p.cpu) p.ready = false; });
     if (this.net && this.isHost) this.send({ t: 'toLobby' });
     this.pushLobby();
   }
