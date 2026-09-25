@@ -48,15 +48,11 @@ export function bakeMoon(r = 20) {
     const d = Math.hypot(x + 0.5 - c, y + 0.5 - c);
     if (d < r) {
       const k = d / r;
-      let col = k < 0.35 ? '#fff4c9' : k < 0.6 ? '#ffe7a8' : k < 0.85 ? '#ffd07a' : '#f0a860';
-      if ((x * 7 + y * 3) % 11 === 0 && k > 0.4) col = '#e39a58';
+      let col = k < 0.45 ? '#fff6d6' : k < 0.75 ? '#ffecb8' : k < 0.92 ? '#ffdc98' : '#f4c47a';
+      const crater = (px, py, pr) => Math.hypot(x - c - px, y - c - py) < pr;
+      if (crater(-6, -5, 3.2) || crater(7, 4, 2.4) || crater(-3, 9, 1.8) || crater(9, -8, 1.5)) col = '#f0d49a';
       R(ctx, col, x, y, 1, 1);
     } else if (Math.abs(d - (r + 2.5)) < 0.6 && (Math.atan2(y - c, x - c) * 8 | 0) % 2 === 0) R(ctx, '#ff7ac8', x, y, 1, 1);
-  }
-  // cat-slit shadow across the moon (a sleeping cat eye)
-  for (let y = -r; y < r; y++) {
-    const w = Math.max(0, Math.round((1 - Math.abs(y / r)) * 3.2));
-    R(ctx, '#c7824a', Math.round(c) - w, Math.round(c + y), w * 2, 1);
   }
   return cv;
 }

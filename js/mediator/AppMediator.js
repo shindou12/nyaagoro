@@ -18,7 +18,7 @@ import { Session, pickOther } from '../net/Session.js';
 import { pickTransport } from '../net/transports.js';
 import { PLAYER_CATS, BREEDS } from '../art/catArt.js';
 import { STAGES, ENDING, CHARS } from '../story/StoryData.js';
-import { SONG_BPM } from '../audio/Bgm.js';
+import { SONG_BAR } from '../audio/Bgm.js';
 
 const store = {
   get(k, d) { try { return localStorage.getItem('nyagoro.' + k) ?? d; } catch { return d; } },
@@ -116,6 +116,7 @@ export class AppMediator {
     if (type === 'ui:cat') return this.onCatPick(detail.slot, detail.dir);
     if (type === 'dlg:next') { this.audio.unlock(); return this.dlgNext(); }
     if (type === 'dlg:skip') return this.dlgSkip();
+    if (type === 'credits:cue') { this.onCreditsCue(detail.id); return; }
     if (type === 'credits:skip') { if (this.state === 'credits') this.finishCredits(); return; }
     if (type === 'dlg:char') { this.sfx.ui(detail.who === 'nar' ? 'type' : 'tick'); return; }
     if (type !== 'ui:click') return;
@@ -603,12 +604,6 @@ export class AppMediator {
     this.go('credits');
     const snap = document.createElement('canvas'); snap.width = 320; snap.height = 180;
     const sc = snap.getContext('2d'); sc.drawImage(r.background.el, 0, 0); sc.drawImage(r.world.el, 0, 0);
-    const cast = [
-      ['mike', '神社裏の 新しい看板の下で'], ['tama', '空き地の 屋台のあとで、今夜も 皿をふたつ'], ['neo', '駅前のクラブと、ときどき 空き地'],
-      ['piko', '路地のデータを 今も 保存中（においは まだ）'], ['yuki', '飼い主さんの ひざの上'], ['hachi', 'だれかの 次の場所を 探す毎日'],
-      ['luna', 'NYAGORO CUPの看板を 新しい街で 修理中'], ['yoru', '瓦礫の上の、夜の主'], ['hai', 'ぜんぶ、見届けた'], ['shisho', '月のほう'],
-    ].map(([id, line]) => ({ cat: CHARS[id].cat, name: CHARS[id].name, line, expr: id === 'shisho' ? { eyes: 'closed', mouth: 'w' } : null }));
-    cast.push({ cat: this.me.cat, name: this.me.name, line: 'まねっこ名人（二代目）', expr: { eyes: 'happy', mouth: 'nya' } });
     const staff = [
       ['原案', '「にゃー・ごろ・ごろにゃー」を 思いついた ひと'],
       ['ゲームデザイン・ドット絵・音楽', 'Claude'],
@@ -616,10 +611,15 @@ export class AppMediator {
       ['フォント', 'DotGothic16'],
       ['そして', `あそんでくれた ${this.me.name}`],
     ];
-    const bar = 4 * 60 / SONG_BPM;
     this.bgm.playSong({ onEnd: () => { if (this.state === 'credits') this.finishCredits(); } });
-    r.credits.play({ snapshot: snap, clock: () => this.bgm.songTime(), bar, cast, staff, name: this.me.name });
-    setTimeout(() => { if (this.state === 'credits') this.sfx.nya(BREEDS[this.me.cat].voice, BREEDS[this.me.cat].pitch, 0, 0.6); }, (27.6 * bar + 0.3) * 1000);
+    r.credits.play({ alley: snap, meCat: this.me.cat, name: this.me.name, clock: () => this.bgm.songTime(), bar: SONG_BAR, staff });
+  }
+
+  onCreditsCue(id) {
+    const me = BREEDS[this.me.cat] || BREEDS.tama;
+    if (id === 'far') this.sfx.farNya(BREEDS.boss.voice, BREEDS.boss.pitch * 0.97);
+    if (id === 'chibi') this.sfx.nya(me.voice, me.pitch, -0.1, 0.9);
+    if (id === 'kitten') this.sfx.kittenNya();
   }
 
   finishCredits() {

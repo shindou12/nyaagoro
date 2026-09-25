@@ -53,7 +53,7 @@ await p.evaluate(() => { const m = window.__nyagoro.mediator; m.session.stopMatc
 for (let i = 0; i < 200 && (await st()) === 'dialogue'; i++) {
   await p.waitForTimeout(400);
   const typing = await p.evaluate(() => window.__nyagoro.root.dialogue.isTyping());
-  if (!typing) { await p.waitForTimeout(1500); await p.keyboard.press('Space'); }
+  if (!typing) { await p.waitForTimeout(1100); await p.keyboard.press('Space'); }
 }
 console.log('credits started:', await st());
 for (let i = 0; i < 200 && (await st()) === 'credits'; i++) await p.waitForTimeout(500);

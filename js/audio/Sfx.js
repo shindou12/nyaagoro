@@ -27,6 +27,13 @@ export class Sfx {
     const a = this.a;
     [0, 0.09].forEach((d, i) => { a.tone(i ? 3520 : 2637, 0.9, { type: 'sine', gain: 0.09, when: a.now + d, send: 0.5, attack: 0.002, release: 0.8 }); a.tone(i ? 5274 : 3951, 0.5, { type: 'sine', gain: 0.03, when: a.now + d, send: 0.4 }); });
   }
+  /** a meow from far, far away — soft, washed in reverb */
+  farNya(voice = 'old_cat2', pitch = 0.95) {
+    const a = this.a;
+    a.sample(voice, { rate: pitch, gain: 0.22, pan: 0.55, maxDur: 1.2, send: 1.4 });
+    a.sample(voice, { rate: pitch, gain: 0.08, pan: 0.7, maxDur: 1.2, send: 1.2, when: a.now + 0.42 });
+  }
+  kittenNya() { this.a.sample('cat_sweet_voice2', { rate: 1.45, gain: 0.7, pan: 0.15, maxDur: 0.6, send: 0.35 }); }
   keyDown() { this.a.tone(2400, 0.015, { type: 'square', gain: 0.025, filter: 5000 }); }
 
   // ---------------------------------------------------------------- actions

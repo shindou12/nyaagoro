@@ -4,6 +4,7 @@ import { bakeCity } from '../../art/alleyArt.js';
 import { portrait } from '../../art/catArt.js';
 import { toURL } from '../../art/icons.js';
 import { makeCanvas } from '../../art/pixel.js';
+import { cuteIris, drawPupil } from '../../art/eyeArt.js';
 
 const ease = (k) => 1 - Math.pow(1 - Math.min(1, Math.max(0, k)), 3);
 const easeIn = (k) => Math.pow(Math.min(1, Math.max(0, k)), 2.4);
@@ -23,7 +24,7 @@ export class IntroZoom extends View {
     this.state = 'off';
     this.glyphs = Array.from({ length: 90 }, (_, i) => ({ a: Math.random() * Math.PI * 2, r: 48 + Math.random() * 60, s: (Math.random() - 0.5) * 0.6, c: i % 3 }));
     this.stars = Array.from({ length: 120 }, () => ({ x: Math.random() * 320 - 160, y: Math.random() * 180 - 90, z: Math.random() }));
-    this.iris = this.makeIris(40);
+    this.iris = cuteIris(40, '#8ff05a');
     this.fired = {};
   }
   makeIris(r) {
@@ -88,22 +89,35 @@ export class IntroZoom extends View {
       ctx.globalAlpha = 1;
     }
     // the eye / portal
-    const open = dive ? ease(lt / 0.55) : 0.06 + Math.max(0, Math.sin(lt * 1.3)) * 0.04;
+    // round pupil that gently "breathes"; on start it dilates into a window onto the city
+    const open = dive ? ease(lt / 0.55) : 0;
+    const pr = 17 + Math.sin(lt * 1.6) * 1.5 + open * (R - 17);
     ctx.save();
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip();
-    if (zoomK < 0.2) ctx.drawImage(this.iris, cx - this.iris.width / 2, cy - this.iris.height / 2);
-    // pupil = window into the city
+    if (zoomK < 0.2) ctx.drawImage(this.iris, Math.round(cx - this.iris.width / 2), Math.round(cy - this.iris.height / 2));
+    if (!dive) {
+      drawPupil(ctx, cx, cy, pr);
+      // a soft, cute blink every few seconds
+      const bl = (lt % 4.2) / 0.28;
+      if (bl < 1) {
+        const k = Math.sin(bl * Math.PI) * (R + 2);
+        ctx.fillStyle = '#2a2050';
+        ctx.fillRect(cx - R - 2, cy - R - 2, R * 2 + 4, k);
+        ctx.fillRect(cx - R - 2, cy + R + 2 - k, R * 2 + 4, k);
+      }
+      ctx.restore();
+      return;
+    }
     ctx.beginPath();
-    const pw = Math.max(2, open * R), ph = R;
-    ctx.ellipse(cx, cy, pw, ph, 0, 0, Math.PI * 2);
+    ctx.arc(cx, cy, Math.max(2, pr), 0, Math.PI * 2);
     ctx.clip();
     ctx.fillStyle = '#120c30'; ctx.fillRect(0, 0, 320, 180);
     const cityZoom = 0.6 + zoomK * 1.6 + (dive ? easeIn((lt - 1.5) / 0.9) * 5 : 0);
     const fx = 160, fy = 132; // alley gap in the city image
     ctx.drawImage(this.city, cx - fx * cityZoom, cy - fy * cityZoom + (1 - zoomK) * 20, 320 * cityZoom, 180 * cityZoom);
     ctx.restore();
-    // eye shine
-    if (zoomK < 0.1) { ctx.fillStyle = '#ffffff'; ctx.fillRect(cx - 18, cy - 20, 4, 4); ctx.fillRect(cx - 12, cy - 22, 2, 2); }
+    // sparkles stay on the glass while the pupil opens
+    if (zoomK < 0.1) { ctx.globalAlpha = 1 - open * 0.7; ctx.fillStyle = '#ffffff'; ctx.fillRect(cx - 14, cy - 16, 6, 6); ctx.fillRect(cx + 9, cy + 8, 3, 3); ctx.globalAlpha = 1; }
     // flash into the alley
     if (dive && lt > 2.1) {
       const k = Math.min(1, (lt - 2.1) / 0.25);

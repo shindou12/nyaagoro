@@ -7,6 +7,8 @@
 //   L4 four-on-the-floor, 16th hats, stabs, crowd "にゃ!" chant
 // The arp flips direction in 逆モード; tension mode closes the filter.
 import { mtof } from './AudioEngine.js';
+import { installEndingSong } from './EndingSong.js';
+export { SONG_BPM, SONG_BAR, SONG_BARS } from './EndingSong.js';
 
 const CHORDS = [
   { root: 45, pad: [57, 60, 64, 67], arp: [69, 72, 76, 79] }, // Am7
@@ -22,26 +24,6 @@ const LEAD = [
   [74, _, _, 76, 74, _, 71, _, 67, _, _, _, 74, _, 76, _],
 ];
 const BASS = [[0, 0], [3, 12], [6, 0], [8, 0], [10, 7], [11, 12], [14, 10]];
-
-// ---- ending arrangement "Neon Alley Purr (after the full moon)" ----
-// chorus lifts to IV-V-iii-vi with a new singing melody
-const CHORUS = [
-  { root: 41, pad: [53, 57, 60, 64], arp: [65, 69, 72, 76] }, // Fmaj7
-  { root: 43, pad: [55, 59, 62, 67], arp: [67, 71, 74, 79] }, // G
-  { root: 40, pad: [52, 55, 59, 62], arp: [64, 67, 71, 74] }, // Em7
-  { root: 45, pad: [57, 60, 64, 67], arp: [69, 72, 76, 79] }, // Am7
-];
-const CHORUS_LEAD = [
-  [81, _, _, 79, 77, _, 76, _, 77, _, 79, _, 81, _, _, _],
-  [83, _, _, 81, 79, _, 76, _, 74, _, 76, _, 79, _, _, _],
-  [79, _, _, 76, 74, _, 71, _, 72, _, 74, _, 76, _, _, _],
-  [72, _, 74, _, 76, _, _, 79, 76, _, _, _, _, _, _, _],
-];
-// bar-by-bar plan: which parts play (28 bars ≈ 73s at 92bpm)
-//  sec: i=intro v=verse w=verse+lead c=chorus b=break o=outro
-const SONG = 'iiii vvvv wwww cccccccc bbbb oooo'.replace(/ /g, '');
-export const SONG_BPM = 92;
-export const SONG_BARS = SONG.length;
 
 export class Bgm {
   constructor(engine, sfx) {
@@ -115,101 +97,9 @@ export class Bgm {
     return { phase: Math.min(1, (now - last.t) / len), n: last.n, bar: last.bar, on: this.playing };
   }
 
-  /** play the ending arrangement once; calls onBar(bar) per bar and onEnd() after the final chord */
-  playSong({ onBar, onEnd } = {}) {
-    if (!this.playing) this.start();
-    const c = this.a.ctx;
-    this.song = { onBar, onEnd, step: 0 };
-    this.bpm = this.targetBpm = SONG_BPM;
-    this.nextTime = c.currentTime + 0.15;
-    this.layers.forEach((g) => { g.gain.cancelScheduledValues(c.currentTime); g.gain.setTargetAtTime(1, c.currentTime, 0.05); });
-    this.leadGain.gain.setTargetAtTime(1, c.currentTime, 0.05); this.arpGain.gain.setTargetAtTime(1, c.currentTime, 0.05);
-    this.a.bgmFilter.frequency.setTargetAtTime(18000, c.currentTime, 0.1);
-    this.a.bgmBus.gain.setTargetAtTime(this.a.volume.bgm * 1.25, c.currentTime, 0.1);
-    this.rain.gain.setTargetAtTime(0.03, c.currentTime, 0.5);
-    this.songStart = this.nextTime;
-  }
-  songTime() { return this.songStart ? this.a.now - this.songStart : 0; }
-  stopSong() {
-    if (!this.song) return;
-    this.song = null;
-    this.a.bgmBus.gain.setTargetAtTime(this.a.volume.bgm, this.a.now, 0.3);
-    this.applyLevels();
-  }
-
-  songStep(i, t) {
-    const S = this.song, bar = Math.floor(i / 16), s = i % 16, sec = SONG[bar];
-    if (!sec) { // final chord, then done
-      if (s === 0) {
-        this.pad([57, 60, 64, 67, 71], t, 6, this.layers[0]);
-        this.musicbox(mtof(81), t, 5); this.musicbox(mtof(76), t + 0.05, 5);
-        this.kick(t, 0.4, this.layers[0]);
-        const cb = S.onEnd; setTimeout(() => cb && cb(), Math.max(0, (t - this.a.now) * 1000 + 5500));
-        this.song = { done: true };
-      }
-      return;
-    }
-    const chorus = sec === 'c';
-    const prog = chorus ? CHORUS : CHORDS;
-    const ch = prog[bar % 4];
-    const beat = 60 / this.bpm;
-    const L = this.layers;
-    if (s === 0 && S.onBar) { const d = (t - this.a.now) * 1000; setTimeout(() => S.onBar(bar, sec), Math.max(0, d)); }
-    if (s % 4 === 0) { this.beats.push({ t, n: i / 4, bar }); if (this.beats.length > 8) this.beats.shift(); }
-    // pad always (softer in intro/outro)
-    if (s === 0) this.pad(ch.pad, t, beat * 4, L[0]);
-    // music box: intro / break / outro carry the melody gently, an octave up
-    const lead = (chorus ? CHORUS_LEAD : LEAD)[bar % 4][s];
-    if ((sec === 'i' || sec === 'b' || sec === 'o') && lead > 0) this.musicbox(mtof(lead + 12), t, beat * (sec === 'o' ? 2.4 : 1.6));
-    if (sec === 'o' && s === 0) this.musicbox(mtof(ch.arp[0] + 12), t, beat * 3);
-    // rhythm section
-    if (sec === 'v' || sec === 'w' || chorus) {
-      if (s === 0 || s === 8) this.kick(t, 0.55, L[0]);
-      if (s % 2 === 0) this.hat(t, s % 4 === 2 ? 0.06 : 0.03, 0.03, L[1]);
-      for (const [bs, off] of BASS) if (bs === s) this.bass(mtof(ch.root + off - 12), t, beat * 0.45, L[2]);
-      const idx = s % 8, n = ch.arp[idx % 4] + (idx >= 4 ? 12 : 0);
-      if (s % 2 === 0) this.pluck(mtof(n), t, beat * 0.45, this.arpGain, 0.04);
-    }
-    if (sec === 'w' || chorus) {
-      if (s === 4 || s === 12) this.clap(t, L[2]);
-      if (lead > 0) this.lead(mtof(lead), t, beat * 0.9, this.leadGain);
-    }
-    if (chorus) {
-      if (s % 4 === 0) this.kick(t, 0.7, L[4]);
-      this.hat(t, 0.02, 0.02, L[4]);
-      if (s === 6 || s === 14) this.stab(ch.pad, t, L[4]);
-      if (s % 4 === 2) this.hat(t, 0.05, 0.14, L[3]);
-      if (bar % 4 === 3 && s >= 12) this.snare(t, 0.06 + (s - 12) * 0.02, L[4]);
-      if (bar >= 16 && (s === 4 || s === 12) && this.sfx) setTimeout(() => this.sfx.chant(2), Math.max(0, (t - this.a.now) * 1000));
-    }
-    if (sec === 'b') { // the arp runs backwards — a nod to 逆モード
-      const idx = 7 - (s % 8), n = ch.arp[idx % 4] + (idx >= 4 ? 12 : 0);
-      if (s % 2 === 0) this.pluck(mtof(n), t, beat * 0.6, this.arpGain, 0.03);
-    }
-  }
-
-  musicbox(f, t, dur) {
-    const c = this.a.ctx;
-    const g = c.createGain(); this.env(g, t, 0.07, 0.003, dur, dur * 0.9);
-    g.connect(this.layers[3]);
-    const s = c.createGain(); s.gain.value = 0.45; g.connect(s).connect(this.a.reverbIn);
-    const d = c.createGain(); d.gain.value = 0.25; g.connect(d).connect(this.a.delayIn);
-    this.osc('sine', f, t, dur, g); this.osc('triangle', f * 2, t, dur * 0.4, g, 3);
-  }
-
   schedule() {
     const c = this.a.ctx;
-    if (this.song) {
-      while (this.nextTime < c.currentTime + 0.12 && this.song && !this.song.done) {
-        const i = this.song.step;
-        this.songStep(i, this.nextTime);
-        const bar = Math.floor(i / 16);
-        const rit = bar >= SONG_BARS - 2 ? 1 + (bar - (SONG_BARS - 2) + (i % 16) / 16) * 0.12 : 1; // ritardando
-        this.nextTime += (60 / this.bpm / 4) * rit;
-        if (this.song) this.song.step = i + 1;
-      }
-      return;
-    }
+    if (this.song) { this.scheduleSong(); return; }
     while (this.nextTime < c.currentTime + 0.12) {
       this.playStep(this.step, this.nextTime);
       const spb = 60 / this.bpm / 4;
@@ -353,3 +243,5 @@ export class Bgm {
     for (const n of notes) this.osc('sawtooth', mtof(n + 12), t, 0.18, fl, 10);
   }
 }
+
+installEndingSong(Bgm);
